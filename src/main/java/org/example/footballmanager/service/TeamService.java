@@ -1,26 +1,32 @@
 package org.example.footballmanager.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.dto.request.TeamRequestDto;
+import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.exception.TeamNotFoundException;
+import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.repository.TeamRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TeamService {
 
     private final TeamRepository teamRepository;
+    private final TeamMapper teamMapper;
 
-    public Team save(Team team) {
-        return teamRepository.save(team);
+    public TeamResponseDto save(TeamRequestDto requestDto) {
+        Team team = teamMapper.toEntity(requestDto);
+        Team savedTeam = teamRepository.save(team);
+        return teamMapper.toDto(savedTeam);
     }
 
-    public Optional<Team> findById(Long id) {
-        return teamRepository.findById(id);
+    public Team findById(Long id) {
+        return teamRepository.findById(id)
+                .orElseThrow(() -> new TeamNotFoundException(id));
     }
 
     public Page<Team> findAll(Pageable pageable) {
@@ -28,6 +34,9 @@ public class TeamService {
     }
 
     public void deleteById(Long id) {
-        teamRepository.deleteById(id);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new TeamNotFoundException(id));
+        teamRepository.delete(team);
     }
+
 }
