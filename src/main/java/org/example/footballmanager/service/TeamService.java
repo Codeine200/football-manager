@@ -24,13 +24,21 @@ public class TeamService {
         return teamMapper.toDto(savedTeam);
     }
 
+    public TeamResponseDto update(Long id, TeamRequestDto dto) {
+        Team team = findById(id);
+        teamMapper.updateFromDto(dto, team);
+        return teamMapper.toDto(teamRepository.save(team));
+    }
+
     public Team findById(Long id) {
         return teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
     }
 
-    public Page<Team> findAll(Pageable pageable) {
-        return teamRepository.findAll(pageable);
+    public Page<TeamResponseDto> findAll(Pageable pageable) {
+        return teamRepository
+                .findAll(pageable)
+                .map(teamMapper::toDto);
     }
 
     public void deleteById(Long id) {
@@ -38,5 +46,4 @@ public class TeamService {
                 .orElseThrow(() -> new TeamNotFoundException(id));
         teamRepository.delete(team);
     }
-
 }

@@ -30,7 +30,7 @@ public class Player {
     @Column(name = "middle_name")
     private String middleName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "id_team")
     private Team team;
 }

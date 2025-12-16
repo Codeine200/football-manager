@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
 import org.example.footballmanager.entity.Player;
+import org.example.footballmanager.entity.Team;
 import org.example.footballmanager.exception.PlayerNotFoundException;
 import org.example.footballmanager.mapper.PlayerMapper;
 import org.example.footballmanager.repository.PlayerRepository;
@@ -30,13 +31,31 @@ public class PlayerService {
         return playerMapper.toDto(saved);
     }
 
-    public Player findById(Long id) {
-        return playerRepository.findById(id)
+    public PlayerResponseDto update(Long id, PlayerRequestDto dto) {
+        Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
+
+        Team team = null;
+        if (dto.teamId() != null) {
+            team = teamService.findById(dto.teamId());
+        }
+
+        playerMapper.updateFromDto(dto, player);
+        player.setTeam(team);
+        Player saved = playerRepository.save(player);
+        return playerMapper.toDto(saved);
     }
 
-    public Page<Player> findAll(Pageable pageable) {
-        return playerRepository.findAll(pageable);
+    public PlayerResponseDto findById(Long id) {
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
+        return playerMapper.toDto(player);
+    }
+
+    public Page<PlayerResponseDto> findAll(Pageable pageable) {
+        return playerRepository
+                .findAll(pageable)
+                .map(playerMapper::toDto);
     }
 
     public void deleteById(Long id) {
@@ -44,5 +63,4 @@ public class PlayerService {
                 .orElseThrow(() -> new PlayerNotFoundException(id));
         playerRepository.delete(player);
     }
-
 }
