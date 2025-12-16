@@ -2,16 +2,16 @@ CREATE SEQUENCE football.team_id_seq START 1;
 CREATE SEQUENCE football.player_id_seq START 1;
 
 CREATE TABLE football.team (
-    id INT PRIMARY KEY DEFAULT nextval('football.team_id_seq'),
+    id BIGINT PRIMARY KEY DEFAULT nextval('football.team_id_seq'),
     name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE football.player (
-    id INT PRIMARY KEY DEFAULT nextval('football.player_id_seq'),
+    id BIGINT PRIMARY KEY DEFAULT nextval('football.player_id_seq'),
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     middle_name VARCHAR(50),
-    id_team INT REFERENCES football.team(id)
+    id_team BIGINT REFERENCES football.team(id)
 );
 
 CREATE INDEX idx_player_id_team ON football.player(id_team);
