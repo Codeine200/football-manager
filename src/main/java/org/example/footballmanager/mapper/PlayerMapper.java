@@ -6,7 +6,6 @@ import org.example.footballmanager.entity.Player;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", uses = TeamMapper.class)
 public interface PlayerMapper {
@@ -14,7 +13,7 @@ public interface PlayerMapper {
     PlayerResponseDto toDto(Player player);
 
     @Mapping(target = "team", ignore = true)
-    //    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id", ignore = true)
     Player toEntity(PlayerRequestDto dto);
 
     @Mapping(target = "id", ignore = true)
