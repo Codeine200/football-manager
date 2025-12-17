@@ -37,6 +37,7 @@ public class PlayerController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public PlayerResponseDto create(@RequestBody PlayerRequestDto dto) {
         return playerFacade.save(dto);
     }

@@ -2,8 +2,6 @@ package org.example.footballmanager.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,7 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.footballmanager.enums.TeamType;
 
 @Entity
 @Table(name = "match_stats", schema = "football")
@@ -41,15 +38,14 @@ public class MatchStats {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "team_type", length = 10, nullable = false)
-    private TeamType teamType;
+    @Column(name = "is_guest")
+    private boolean isGuest;
 
     @Column(name = "score")
     private Integer score;
 
-    @Column(name = "winner")
-    private Boolean winner;
+    @Column(name = "is_winner")
+    private Boolean isWinner;
 
     @Column(name = "goals")
     private Integer goals;

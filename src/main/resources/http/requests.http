@@ -61,3 +61,21 @@ Content-Type: application/json
 
 ### Delete a player
 DELETE http://localhost:8080/api/v1/players/1
+
+### Craete a match
+POST http://localhost:8080/api/v1/matches
+Content-Type: application/json
+
+{
+  "season": 2025,
+  "matchDate": "2025-03-12",
+  "team1": {
+    "id": 1,
+    "isGuest": false
+  },
+  "team2": {
+    "id": 2,
+    "isGuest": true
+  }
+}
+

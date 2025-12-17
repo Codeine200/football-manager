@@ -1,14 +1,21 @@
 package org.example.footballmanager.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.footballmanager.enums.MatchStatus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,7 +24,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Match {
 
     @Id
@@ -35,10 +41,9 @@ public class Match {
     @Column(name = "match_date", nullable = false)
     private LocalDate matchDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private MatchStatus status;
+    @Column(name = "is_finished")
+    private boolean isFinished;
 
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
-    private List<MatchStats> stats;
+    private List<MatchStats> stats = new ArrayList<>();
 }
