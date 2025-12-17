@@ -1,5 +1,6 @@
 package org.example.footballmanager.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public class MatchCreateRequestDto {
     @Data
     public static class TeamDto {
         private Long id;
+        @JsonProperty("isGuest")
         private boolean isGuest;
     }
 }
