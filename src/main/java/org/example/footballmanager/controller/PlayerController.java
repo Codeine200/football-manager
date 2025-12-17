@@ -3,8 +3,7 @@ package org.example.footballmanager.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
-import org.example.footballmanager.entity.Player;
-import org.example.footballmanager.mapper.PlayerMapper;
+import org.example.footballmanager.facade.PlayerFacade;
 import org.example.footballmanager.service.PlayerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,21 +23,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayerController {
 
     private final PlayerService playerService;
+    private final PlayerFacade playerFacade;
 
     @GetMapping
     public Page<PlayerResponseDto> getAll(Pageable pageable) {
-        return playerService.findAll(pageable);
+        return playerFacade.findAll(pageable);
     }
 
 
     @GetMapping("/{id}")
     public PlayerResponseDto getById(@PathVariable Long id) {
-        return playerService.findById(id);
+        return playerFacade.findById(id);
     }
 
     @PostMapping
     public PlayerResponseDto create(@RequestBody PlayerRequestDto dto) {
-        return playerService.save(dto);
+        return playerFacade.save(dto);
     }
 
     @PutMapping("/{id}")
@@ -46,7 +46,7 @@ public class PlayerController {
             @PathVariable Long id,
             @RequestBody PlayerRequestDto dto
     ) {
-        return playerService.update(id, dto);
+        return playerFacade.update(id, dto);
     }
 
     @DeleteMapping("/{id}")

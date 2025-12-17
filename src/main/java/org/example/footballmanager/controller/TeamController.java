@@ -6,6 +6,7 @@ import org.example.footballmanager.dto.request.TeamRequestDto;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
 import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.facade.TeamFacade;
 import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.service.TeamService;
 import org.springframework.data.domain.Page;
@@ -27,28 +28,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class TeamController {
 
     private final TeamService teamService;
-    private final TeamMapper teamMapper;
+    private final TeamFacade teamFacade;
 
     @GetMapping
     public Page<TeamResponseDto> getAll(Pageable pageable) {
-        return teamService.findAll(pageable);
+        return teamFacade.findAll(pageable);
     }
 
     @GetMapping("/{id}")
     public TeamResponseDto getById(@PathVariable Long id) {
-        return teamMapper.toDto(teamService.findById(id));
+        return teamFacade.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TeamResponseDto create(@RequestBody @Valid TeamRequestDto dto) {
-        return teamService.save(dto);
+        return teamFacade.save(dto);
     }
 
     @PutMapping("/{id}")
     public TeamResponseDto update(@PathVariable Long id,
                                   @RequestBody @Valid TeamRequestDto dto) {
-        return teamService.update(id, dto);
+        return teamFacade.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
