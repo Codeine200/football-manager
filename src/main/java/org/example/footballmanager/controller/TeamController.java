@@ -3,13 +3,10 @@ package org.example.footballmanager.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.TeamRequestDto;
-import org.example.footballmanager.dto.response.PlayerResponseDto;
+import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.TeamResponseDto;
-import org.example.footballmanager.entity.Team;
 import org.example.footballmanager.facade.TeamFacade;
-import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.service.TeamService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +28,7 @@ public class TeamController {
     private final TeamFacade teamFacade;
 
     @GetMapping
-    public Page<TeamResponseDto> getAll(Pageable pageable) {
+    public PageResponse<TeamResponseDto> getAll(Pageable pageable) {
         return teamFacade.findAll(pageable);
     }
 

@@ -2,8 +2,10 @@ package org.example.footballmanager.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.TeamRequestDto;
+import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.mapper.PageMapper;
 import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.service.TeamService;
 import org.springframework.data.domain.Page;
@@ -16,15 +18,18 @@ public class TeamFacade {
 
     private final TeamService teamService;
     private final TeamMapper teamMapper;
+    private final PageMapper pageMapper;
 
     public TeamResponseDto findById(Long id) {
         return teamMapper.toDto(teamService.findById(id));
     }
 
-    public Page<TeamResponseDto> findAll(Pageable pageable) {
-        return teamService
+    public PageResponse<TeamResponseDto> findAll(Pageable pageable) {
+        Page<TeamResponseDto> page = teamService
                 .findAll(pageable)
                 .map(teamMapper::toDto);
+
+        return pageMapper.toDto(page);
     }
 
     public TeamResponseDto save(TeamRequestDto requestDto) {

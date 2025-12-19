@@ -2,7 +2,9 @@ package org.example.footballmanager.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
+import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
+import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.facade.PlayerFacade;
 import org.example.footballmanager.service.PlayerService;
 import org.springframework.data.domain.Page;
@@ -26,7 +28,7 @@ public class PlayerController {
     private final PlayerFacade playerFacade;
 
     @GetMapping
-    public Page<PlayerResponseDto> getAll(Pageable pageable) {
+    public PageResponse<PlayerResponseDto> getAll(Pageable pageable) {
         return playerFacade.findAll(pageable);
     }
 

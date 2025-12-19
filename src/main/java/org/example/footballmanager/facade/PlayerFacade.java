@@ -2,9 +2,12 @@ package org.example.footballmanager.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
+import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
+import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.entity.Player;
 import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.mapper.PageMapper;
 import org.example.footballmanager.mapper.PlayerMapper;
 import org.example.footballmanager.service.PlayerService;
 import org.example.footballmanager.service.TeamService;
@@ -19,16 +22,19 @@ public class PlayerFacade {
     private final PlayerService playerService;
     private final TeamService teamService;
     private final PlayerMapper playerMapper;
+    private final PageMapper pageMapper;
 
     public PlayerResponseDto findById(Long id) {
         Player player = playerService.findById(id);
         return playerMapper.toDto(player);
     }
 
-    public Page<PlayerResponseDto> findAll(Pageable pageable) {
-        return playerService
+    public PageResponse<PlayerResponseDto> findAll(Pageable pageable) {
+        Page<PlayerResponseDto> page = playerService
                 .findAll(pageable)
                 .map(playerMapper::toDto);
+
+        return pageMapper.toDto(page);
     }
 
     public PlayerResponseDto save(PlayerRequestDto dto) {

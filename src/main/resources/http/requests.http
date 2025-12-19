@@ -10,6 +10,9 @@ Content-Type: application/json
   "name": "Red Dragons"
 }
 
+### Get all teams (by default)
+GET http://localhost:8080/api/v1/teams
+
 ### Get all teams (with pagination)
 GET http://localhost:8080/api/v1/teams?page=0&size=10
 
