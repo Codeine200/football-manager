@@ -46,4 +46,9 @@ public class Match {
 
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
     private List<MatchStats> stats = new ArrayList<>();
+
+    public void addStats(MatchStats matchStats) {
+        stats.add(matchStats);
+        matchStats.setMatch(this);
+    }
 }

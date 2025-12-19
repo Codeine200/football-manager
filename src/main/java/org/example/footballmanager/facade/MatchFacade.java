@@ -20,12 +20,10 @@ public class MatchFacade {
 
     public MatchResponseDto createMatch(MatchCreateRequestDto requestDto) {
         Match match = matchMapper.toEntity(requestDto);
-        MatchStats team1 = matchStatsService.create(requestDto.getTeam1().getId(), requestDto.getTeam1().isGuest());
-        MatchStats team2 = matchStatsService.create(requestDto.getTeam2().getId(), requestDto.getTeam2().isGuest());
-        team1.setMatch(match);
-        match.getStats().add(team1);
-        team2.setMatch(match);
-        match.getStats().add(team2);
+        MatchStats stats1 = matchStatsService.create(requestDto.getTeam1());
+        MatchStats stats2 = matchStatsService.create(requestDto.getTeam2());
+        match.addStats(stats1);
+        match.addStats(stats2);
 
         return matchMapper.toDto(matchService.save(match));
     }
