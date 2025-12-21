@@ -13,12 +13,12 @@ import org.example.footballmanager.entity.Team;
 public class TeamTournamentStats {
     Team team;
     String season;
-    Integer played;
-    Integer wins;
-    Integer draws;
-    Integer losses;
-    Integer goalsFor;
-    Integer goalsAgainst;
-    Integer goalDifference;
-    Integer points;
+    Integer played = 0;
+    Integer wins = 0;
+    Integer draws = 0;
+    Integer losses = 0;
+    Integer goalsFor = 0;
+    Integer goalsAgainst = 0;
+    Integer goalDifference = 0;
+    Integer points = 0;
 }

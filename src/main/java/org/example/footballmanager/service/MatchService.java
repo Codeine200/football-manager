@@ -47,7 +47,9 @@ public class MatchService {
             MatchStats teamStats2 = stats.getLast();
 
             TeamTournamentStats teamTournamentStats1 =  teamMap.getOrDefault(teamStats1.getTeam(), new TeamTournamentStats());
+            teamTournamentStats1.setTeam(teamStats1.getTeam());
             TeamTournamentStats teamTournamentStats2 =  teamMap.getOrDefault(teamStats2.getTeam(), new TeamTournamentStats());
+            teamTournamentStats2.setTeam(teamStats2.getTeam());
 
             teamTournamentStats1.setSeason(match.getSeason());
             teamTournamentStats1.setPlayed(teamTournamentStats1.getPlayed() + 1);
