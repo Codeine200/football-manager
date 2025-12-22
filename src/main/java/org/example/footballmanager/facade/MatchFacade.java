@@ -2,6 +2,7 @@ package org.example.footballmanager.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.MatchCreateRequestDto;
+import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.entity.Match;
 import org.example.footballmanager.entity.MatchStats;
@@ -26,5 +27,9 @@ public class MatchFacade {
         match.addStats(stats2);
 
         return matchMapper.toDto(matchService.save(match));
+    }
+
+    public MatchResponseDto finishMatch(Long id, MatchFinishRequestDto request) {
+        return matchMapper.toDto(matchService.finishMatch(id, request));
     }
 }
