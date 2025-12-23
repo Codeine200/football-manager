@@ -1,8 +1,8 @@
 package org.example.footballmanager;
 
+import org.example.footballmanager.entity.Match;
 import org.example.footballmanager.entity.MatchStats;
 import org.example.footballmanager.entity.Team;
-import org.example.footballmanager.entity.Match;
 import org.example.footballmanager.model.TeamTournamentStats;
 import org.example.footballmanager.repository.MatchRepository;
 import org.example.footballmanager.service.MatchService;
@@ -11,17 +11,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class MatchTests {
 
@@ -35,32 +33,40 @@ public class MatchTests {
     void shouldReturnFullStatisticForAllTeamBySeason() {
         String season = "2024";
 
-        Team teamA = Team.builder()
-                .id(1L)
-                .name("Team A")
-                .build();
-        Team teamB = Team.builder()
-                .id(2L)
-                .name("Team B")
-                .build();
-
         Match match = new Match();
-        match.setId(100L);
         match.setSeason(season);
+        match.setMatchDate(LocalDate.now());
 
-        MatchStats statsA = new MatchStats();
-        statsA.setTeam(teamA);
-        statsA.setGoals(2);
-        statsA.setIsWinner(true);
-        statsA.setScore(3);
+        Team teamA = new Team();
+        teamA.setId(1L);
+        teamA.setName("Team A");
 
-        MatchStats statsB = new MatchStats();
-        statsB.setTeam(teamB);
-        statsB.setGoals(1);
-        statsB.setIsWinner(false);
-        statsB.setScore(0);
+        Team teamB = new Team();
+        teamB.setId(2L);
+        teamB.setName("Team 2");
 
-        match.setStats(List.of(statsA, statsB));
+        MatchStats stats1 = MatchStats.builder()
+                .match(match)
+                .team(teamA)
+                .goals(2)
+                .score(3)
+                .isWinner(true)
+                .isGuest(false)
+                .build();
+
+        MatchStats stats2 = MatchStats.builder()
+                .match(match)
+                .team(teamB)
+                .goals(1)
+                .score(0)
+                .isWinner(false)
+                .isGuest(true)
+                .build();
+
+
+        match.addStats(stats1);
+        match.addStats(stats2);
+
 
         when(matchRepository.findAllBySeason(season))
                 .thenReturn(List.of(match));

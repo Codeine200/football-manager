@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
-import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.entity.Player;
 import org.example.footballmanager.entity.Team;
 import org.example.footballmanager.mapper.PageMapper;
@@ -29,9 +28,17 @@ public class PlayerFacade {
         return playerMapper.toDto(player);
     }
 
-    public PageResponse<PlayerResponseDto> findAll(Pageable pageable) {
+    public PageResponse<PlayerResponseDto> findAllByTeamId(Long teamId, Pageable pageable) {
+        if (teamId == null) {
+            Page<PlayerResponseDto> page = playerService
+                    .findAll(pageable)
+                    .map(playerMapper::toDto);
+
+            return pageMapper.toDto(page);
+        }
+
         Page<PlayerResponseDto> page = playerService
-                .findAll(pageable)
+                .findAllByTeamId(teamId, pageable)
                 .map(playerMapper::toDto);
 
         return pageMapper.toDto(page);

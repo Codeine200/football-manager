@@ -28,6 +28,11 @@ public class PlayerService {
                 .findAll(pageable);
     }
 
+    public Page<Player> findAllByTeamId(Long teamId, Pageable pageable) {
+        return playerRepository
+                .findAllByTeam_Id(teamId, pageable);
+    }
+
     public void deleteById(Long id) {
         Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
