@@ -1,6 +1,8 @@
 package org.example.footballmanager.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.dto.request.PlayerAssignRequestDto;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
@@ -40,16 +42,24 @@ public class PlayerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PlayerResponseDto create(@RequestBody PlayerRequestDto dto) {
+    public PlayerResponseDto create(@Valid @RequestBody PlayerRequestDto dto) {
         return playerFacade.save(dto);
     }
 
     @PutMapping("/{id}")
     public PlayerResponseDto update(
             @PathVariable Long id,
-            @RequestBody PlayerRequestDto dto
+            @Valid @RequestBody PlayerRequestDto dto
     ) {
         return playerFacade.update(id, dto);
+    }
+
+    @PutMapping("/{id}/assign")
+    public PlayerResponseDto assign(
+            @PathVariable Long id,
+            @Valid @RequestBody PlayerAssignRequestDto dto
+    ) {
+        return playerFacade.assign(id, dto);
     }
 
     @DeleteMapping("/{id}")

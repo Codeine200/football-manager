@@ -43,7 +43,7 @@ public class MatchTests {
 
         Team teamB = new Team();
         teamB.setId(2L);
-        teamB.setName("Team 2");
+        teamB.setName("Team B");
 
         MatchStats stats1 = MatchStats.builder()
                 .match(match)
@@ -63,10 +63,8 @@ public class MatchTests {
                 .isGuest(true)
                 .build();
 
-
         match.addStats(stats1);
         match.addStats(stats2);
-
 
         when(matchRepository.findAllBySeason(season))
                 .thenReturn(List.of(match));

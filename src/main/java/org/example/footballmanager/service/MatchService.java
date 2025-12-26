@@ -7,7 +7,6 @@ import org.example.footballmanager.entity.Match;
 import org.example.footballmanager.entity.MatchStats;
 import org.example.footballmanager.entity.Team;
 import org.example.footballmanager.exception.MatchNotFoundException;
-import org.example.footballmanager.exception.TeamNotFoundException;
 import org.example.footballmanager.model.TeamTournamentStats;
 import org.example.footballmanager.repository.MatchRepository;
 import org.springframework.stereotype.Service;
@@ -111,43 +110,43 @@ public class MatchService {
         matchStatsBuilder1.match(match);
         MatchStats.MatchStatsBuilder matchStatsBuilder2 = MatchStats.builder();
         matchStatsBuilder2.match(match);
-        if (request.getTeam1().getGoals() == request.getTeam2().getGoals()) {
+        if (request.team1().goals() == request.team2().goals()) {
             matchStatsBuilder1.isWinner(false);
             matchStatsBuilder1.score(1);
-            matchStatsBuilder1.goals(request.getTeam1().getGoals());
-            matchStatsBuilder1.team(teamService.findById(request.getTeam1().getTeamId()));
-            matchStatsBuilder1.isGuest(isGuest(request.getTeam1(), match));
+            matchStatsBuilder1.goals(request.team1().goals());
+            matchStatsBuilder1.team(teamService.findById(request.team1().teamId()));
+            matchStatsBuilder1.isGuest(isGuest(request.team1(), match));
 
             matchStatsBuilder2.isWinner(false);
             matchStatsBuilder2.score(1);
-            matchStatsBuilder2.goals(request.getTeam2().getGoals());
-            matchStatsBuilder2.team(teamService.findById(request.getTeam2().getTeamId()));
-            matchStatsBuilder2.isGuest(isGuest(request.getTeam2(), match));
+            matchStatsBuilder2.goals(request.team2().goals());
+            matchStatsBuilder2.team(teamService.findById(request.team2().teamId()));
+            matchStatsBuilder2.isGuest(isGuest(request.team2(), match));
 
-        } else if (request.getTeam1().getGoals() > request.getTeam2().getGoals()) {
+        } else if (request.team1().goals() > request.team2().goals()) {
             matchStatsBuilder1.isWinner(true);
-            matchStatsBuilder1.team(teamService.findById(request.getTeam1().getTeamId()));
-            matchStatsBuilder1.goals(request.getTeam1().getGoals());
+            matchStatsBuilder1.team(teamService.findById(request.team1().teamId()));
+            matchStatsBuilder1.goals(request.team1().goals());
             matchStatsBuilder1.score(3);
-            matchStatsBuilder1.isGuest(isGuest(request.getTeam1(), match));
+            matchStatsBuilder1.isGuest(isGuest(request.team1(), match));
 
             matchStatsBuilder2.isWinner(false);
-            matchStatsBuilder2.team(teamService.findById(request.getTeam2().getTeamId()));
-            matchStatsBuilder2.goals(request.getTeam2().getGoals());
+            matchStatsBuilder2.team(teamService.findById(request.team2().teamId()));
+            matchStatsBuilder2.goals(request.team2().goals());
             matchStatsBuilder2.score(0);
-            matchStatsBuilder2.isGuest(isGuest(request.getTeam2(), match));
+            matchStatsBuilder2.isGuest(isGuest(request.team2(), match));
         } else {
             matchStatsBuilder1.isWinner(false);
-            matchStatsBuilder1.team(teamService.findById(request.getTeam1().getTeamId()));
-            matchStatsBuilder1.goals(request.getTeam1().getGoals());
+            matchStatsBuilder1.team(teamService.findById(request.team1().teamId()));
+            matchStatsBuilder1.goals(request.team1().goals());
             matchStatsBuilder1.score(0);
-            matchStatsBuilder1.isGuest(isGuest(request.getTeam1(), match));
+            matchStatsBuilder1.isGuest(isGuest(request.team1(), match));
 
             matchStatsBuilder2.isWinner(true);
-            matchStatsBuilder2.team(teamService.findById(request.getTeam2().getTeamId()));
-            matchStatsBuilder2.goals(request.getTeam2().getGoals());
+            matchStatsBuilder2.team(teamService.findById(request.team2().teamId()));
+            matchStatsBuilder2.goals(request.team2().goals());
             matchStatsBuilder2.score(3);
-            matchStatsBuilder2.isGuest(isGuest(request.getTeam2(), match));
+            matchStatsBuilder2.isGuest(isGuest(request.team2(), match));
         }
 
         List<MatchStats> matchStats = new ArrayList<>();
@@ -157,11 +156,11 @@ public class MatchService {
     }
 
     private boolean isGuest(TeamDto team1, Match match) {
-        return match.getStats().stream().anyMatch(s -> s.getTeam().getId().equals(team1.getTeamId()) && s.isGuest());
+        return match.getStats().stream().anyMatch(s -> s.getTeam().getId().equals(team1.teamId()) && s.isGuest());
     }
 
     private boolean isCorrectTeam(Team team, MatchFinishRequestDto request) {
-        List<Long> ids = List.of(request.getTeam1().getTeamId(), request.getTeam2().getTeamId());
+        List<Long> ids = List.of(request.team1().teamId(), request.team2().teamId());
         return ids.contains(team.getId());
     }
 }

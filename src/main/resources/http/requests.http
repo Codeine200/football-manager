@@ -10,6 +10,14 @@ Content-Type: application/json
   "name": "Red Dragons"
 }
 
+### Create a team with null name
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
 ### Get all teams (by default)
 GET http://localhost:8080/api/v1/teams
 
@@ -42,6 +50,17 @@ Content-Type: application/json
   "firstName": "Lionel",
   "lastName": "Messi",
   "middleName": "Andres",
+  "teamId": 1
+}
+
+### Create a player with a bad request
+POST http://localhost:8080/api/v1/players
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "",
+  "middleName": "",
   "teamId": 1
 }
 

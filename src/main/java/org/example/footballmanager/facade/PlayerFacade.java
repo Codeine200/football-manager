@@ -1,6 +1,7 @@
 package org.example.footballmanager.facade;
 
 import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.dto.request.PlayerAssignRequestDto;
 import org.example.footballmanager.dto.request.PlayerRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
@@ -64,6 +65,19 @@ public class PlayerFacade {
         }
 
         playerMapper.updateFromDto(dto, player);
+        player.setTeam(team);
+        Player saved = playerService.save(player);
+        return playerMapper.toDto(saved);
+    }
+
+    public PlayerResponseDto assign(Long playerId, PlayerAssignRequestDto dto) {
+        Player player = playerService.findById(playerId);
+
+        Team team = null;
+        if (dto.teamId() != null) {
+            team = teamService.findById(dto.teamId());
+        }
+
         player.setTeam(team);
         Player saved = playerService.save(player);
         return playerMapper.toDto(saved);

@@ -1,15 +1,23 @@
 package org.example.footballmanager.dto.request;
 
-import lombok.Data;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class MatchFinishRequestDto {
-    private TeamDto team1;
-    private TeamDto team2;
+public record MatchFinishRequestDto (
+    @NotNull
+    @Valid
+    TeamDto team1,
 
-    @Data
-    public static class TeamDto {
-        private Long teamId;
-        private int goals;
-    }
+    @NotNull
+    @Valid
+    TeamDto team2
+) {
+    public record TeamDto (
+        @NotNull
+        Long teamId,
+
+        @Min(0)
+        int goals
+    ) {}
 }

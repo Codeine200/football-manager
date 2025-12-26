@@ -76,17 +76,11 @@ public class FinishMatchTests {
 
         match = matchRepository.save(match);
 
-        MatchFinishRequestDto.TeamDto dto1 = new MatchFinishRequestDto.TeamDto();
-        dto1.setTeamId(team1.getId());
-        dto1.setGoals(3);
-
-        MatchFinishRequestDto.TeamDto dto2 = new MatchFinishRequestDto.TeamDto();
-        dto2.setTeamId(team2.getId());
-        dto2.setGoals(1);
-
-        MatchFinishRequestDto request = new MatchFinishRequestDto();
-        request.setTeam1(dto1);
-        request.setTeam2(dto2);
+        MatchFinishRequestDto request =
+                new MatchFinishRequestDto(
+                        new MatchFinishRequestDto.TeamDto(team1.getId(), 3),
+                        new MatchFinishRequestDto.TeamDto(team2.getId(), 1)
+                );
 
         Match finishedMatch = matchService.finishMatch(match.getId(), request);
 
