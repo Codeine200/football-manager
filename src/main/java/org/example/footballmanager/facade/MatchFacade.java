@@ -1,14 +1,15 @@
 package org.example.footballmanager.facade;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.domain.Match;
+import org.example.footballmanager.domain.MatchFinish;
 import org.example.footballmanager.dto.request.MatchCreateRequestDto;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
-import org.example.footballmanager.entity.Match;
-import org.example.footballmanager.entity.MatchStats;
+import org.example.footballmanager.entity.MatchEntity;
 import org.example.footballmanager.mapper.MatchMapper;
 import org.example.footballmanager.service.MatchService;
-import org.example.footballmanager.service.MatchStatsService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,20 +17,18 @@ import org.springframework.stereotype.Component;
 public class MatchFacade {
 
     private final MatchService matchService;
-    private final MatchStatsService matchStatsService;
     private final MatchMapper matchMapper;
 
+    @Transactional
     public MatchResponseDto createMatch(MatchCreateRequestDto requestDto) {
-        Match match = matchMapper.toEntity(requestDto);
-        MatchStats stats1 = matchStatsService.create(requestDto.getTeam1());
-        MatchStats stats2 = matchStatsService.create(requestDto.getTeam2());
-        match.addStats(stats1);
-        match.addStats(stats2);
-
-        return matchMapper.toDto(matchService.save(match));
+        Match match = matchMapper.toDomain(requestDto);
+        MatchEntity matchSaved = matchService.createMatch(match);
+        return matchMapper.toDto(matchSaved);
     }
 
+    @Transactional
     public MatchResponseDto finishMatch(Long id, MatchFinishRequestDto request) {
-        return matchMapper.toDto(matchService.finishMatch(id, request));
+        MatchFinish matchFinish = matchMapper.toDomain(request);
+        return matchMapper.toDto(matchService.finishMatch(id, matchFinish));
     }
 }

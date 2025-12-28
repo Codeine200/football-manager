@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.TeamRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.TeamResponseDto;
-import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.mapper.PageMapper;
 import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.service.TeamService;
@@ -33,14 +33,14 @@ public class TeamFacade {
     }
 
     public TeamResponseDto save(TeamRequestDto requestDto) {
-        Team team = teamMapper.toEntity(requestDto);
-        Team savedTeam = teamService.save(team);
-        return teamMapper.toDto(savedTeam);
+        TeamEntity teamEntity = teamMapper.toEntity(requestDto);
+        TeamEntity savedTeamEntity = teamService.save(teamEntity);
+        return teamMapper.toDto(savedTeamEntity);
     }
 
     public TeamResponseDto update(Long id, TeamRequestDto dto) {
-        Team team = teamService.findById(id);
-        teamMapper.updateFromDto(dto, team);
-        return teamMapper.toDto(teamService.save(team));
+        TeamEntity teamEntity = teamService.findById(id);
+        teamMapper.updateFromDto(dto, teamEntity);
+        return teamMapper.toDto(teamService.save(teamEntity));
     }
 }

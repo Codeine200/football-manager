@@ -43,7 +43,7 @@ public class PlayerController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PlayerResponseDto create(@Valid @RequestBody PlayerRequestDto dto) {
-        return playerFacade.save(dto);
+        return playerFacade.create(dto);
     }
 
     @PutMapping("/{id}")

@@ -1,10 +1,12 @@
 package org.example.footballmanager;
 
 import jakarta.transaction.Transactional;
+import org.example.footballmanager.domain.MatchFinish;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
-import org.example.footballmanager.entity.Match;
-import org.example.footballmanager.entity.MatchStats;
-import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.entity.MatchEntity;
+import org.example.footballmanager.entity.MatchStatsEntity;
+import org.example.footballmanager.entity.TeamEntity;
+import org.example.footballmanager.mapper.MatchMapper;
 import org.example.footballmanager.repository.MatchRepository;
 import org.example.footballmanager.repository.TeamRepository;
 import org.example.footballmanager.service.MatchService;
@@ -25,7 +27,7 @@ import static org.assertj.core.api.Fail.fail;
 
 @SpringBootTest
 @Testcontainers
-public class FinishMatchTests {
+public class FinishMatchTestsEntity {
 
     @Container
     static PostgreSQLContainer<?> postgresContainer =
@@ -51,47 +53,51 @@ public class FinishMatchTests {
     @Autowired
     private TeamRepository teamRepository;
 
+    @Autowired
+    private MatchMapper matchMapper;
+
     @Test
     @Transactional
     void shouldFinishMatchAndPersistStats() {
-        Team team1 = teamRepository.save(Team.builder().name("Team A").build());
-        Team team2 = teamRepository.save(Team.builder().name("Team B").build());
+        TeamEntity teamEntity1 = teamRepository.save(TeamEntity.builder().name("Team A").build());
+        TeamEntity teamEntity2 = teamRepository.save(TeamEntity.builder().name("Team B").build());
 
-        Match match = Match.builder()
+        MatchEntity matchEntity = MatchEntity.builder()
                 .season("2025")
                 .matchDate(LocalDate.now())
                 .stats(new ArrayList<>())
                 .build();
 
-        MatchStats stats1 = new MatchStats();
-        stats1.setTeam(team1);
+        MatchStatsEntity stats1 = new MatchStatsEntity();
+        stats1.setTeam(teamEntity1);
         stats1.setGuest(false);
 
-        MatchStats stats2 = new MatchStats();
-        stats2.setTeam(team2);
+        MatchStatsEntity stats2 = new MatchStatsEntity();
+        stats2.setTeam(teamEntity2);
         stats2.setGuest(true);
 
-        match.addStats(stats1);
-        match.addStats(stats2);
+        matchEntity.addStats(stats1);
+        matchEntity.addStats(stats2);
 
-        match = matchRepository.save(match);
+        matchEntity = matchRepository.save(matchEntity);
 
         MatchFinishRequestDto request =
                 new MatchFinishRequestDto(
-                        new MatchFinishRequestDto.TeamDto(team1.getId(), 3),
-                        new MatchFinishRequestDto.TeamDto(team2.getId(), 1)
+                        new MatchFinishRequestDto.TeamDto(teamEntity1.getId(), 3),
+                        new MatchFinishRequestDto.TeamDto(teamEntity2.getId(), 1)
                 );
 
-        Match finishedMatch = matchService.finishMatch(match.getId(), request);
+        MatchFinish matchFinish = matchMapper.toDomain(request);
+        MatchEntity finishedMatchEntity = matchService.finishMatch(matchEntity.getId(), matchFinish);
 
-        assertThat(finishedMatch.isFinished()).isTrue();
-        for (MatchStats stats : finishedMatch.getStats()) {
-            if (stats.getTeam().getId().equals(team1.getId())) {
+        assertThat(finishedMatchEntity.isFinished()).isTrue();
+        for (MatchStatsEntity stats : finishedMatchEntity.getStats()) {
+            if (stats.getTeam().getId().equals(teamEntity1.getId())) {
                 assertThat(stats.getGoals()).isEqualTo(3);
                 assertThat(stats.getScore()).isEqualTo(3);
                 assertThat(stats.getIsWinner()).isTrue();
                 assertThat(stats.isGuest()).isFalse();
-            } else if (stats.getTeam().getId().equals(team2.getId())) {
+            } else if (stats.getTeam().getId().equals(teamEntity2.getId())) {
                 assertThat(stats.getGoals()).isEqualTo(1);
                 assertThat(stats.getScore()).isEqualTo(0);
                 assertThat(stats.getIsWinner()).isFalse();

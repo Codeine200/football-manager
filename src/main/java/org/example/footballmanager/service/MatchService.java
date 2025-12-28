@@ -1,17 +1,20 @@
 package org.example.footballmanager.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.footballmanager.dto.request.MatchFinishRequestDto;
-import org.example.footballmanager.dto.request.MatchFinishRequestDto.TeamDto;
-import org.example.footballmanager.entity.Match;
-import org.example.footballmanager.entity.MatchStats;
-import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.domain.Match;
+import org.example.footballmanager.domain.MatchFinish;
+import org.example.footballmanager.domain.MatchTeamResult;
+import org.example.footballmanager.domain.Team;
+import org.example.footballmanager.domain.TeamTournamentStats;
+import org.example.footballmanager.entity.MatchEntity;
+import org.example.footballmanager.entity.MatchStatsEntity;
+import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.MatchNotFoundException;
-import org.example.footballmanager.model.TeamTournamentStats;
+import org.example.footballmanager.mapper.MatchMapper;
 import org.example.footballmanager.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,26 +27,37 @@ import java.util.Set;
 public class MatchService {
 
     private final MatchRepository matchRepository;
+    private final MatchMapper matchMapper;
     private final TeamService teamService;
 
-    public Match findById(Long id) {
+    public MatchEntity findById(Long id) {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new MatchNotFoundException(id));
     }
 
-    public Match save(Match match) {
-        return matchRepository.save(match);
+    public MatchEntity createMatch(Match matchCreate) {
+        MatchEntity match = matchMapper.toEntity(matchCreate);
+        MatchStatsEntity stats1 = createStats(matchCreate.getTeam1());
+        MatchStatsEntity stats2 = createStats(matchCreate.getTeam2());
+        match.addStats(stats1);
+        match.addStats(stats2);
+
+        return save(match);
+    }
+
+    public MatchEntity save(MatchEntity matchEntity) {
+        return matchRepository.save(matchEntity);
     }
 
     public Set<TeamTournamentStats> getTeamStatsBySeason(String season) {
-        List<Match> matches = matchRepository.findAllBySeason(season);
-        if (matches.isEmpty()) {
+        List<MatchEntity> matchEntities = matchRepository.findAllBySeason(season);
+        if (matchEntities.isEmpty()) {
             return Collections.emptySet();
         }
 
-        Map<Team, TeamTournamentStats> teamMap = new HashMap<>();
-        matches.forEach(match -> {
-            List<MatchStats> stats = match.getStats();
+        Map<TeamEntity, TeamTournamentStats> teamMap = new HashMap<>();
+        matchEntities.forEach(match -> {
+            List<MatchStatsEntity> stats = match.getStats();
             if (stats.size() != 2) {
                 throw new IllegalStateException(
                         "Invalid match state: expected exactly 2 team stats for match id="
@@ -53,13 +67,13 @@ public class MatchService {
                 );
             }
 
-            MatchStats teamStats1 = stats.getFirst();
-            MatchStats teamStats2 = stats.getLast();
+            MatchStatsEntity teamStats1 = stats.getFirst();
+            MatchStatsEntity teamStats2 = stats.getLast();
 
             TeamTournamentStats teamTournamentStats1 =  teamMap.getOrDefault(teamStats1.getTeam(), new TeamTournamentStats());
-            teamTournamentStats1.setTeam(teamStats1.getTeam());
+            teamTournamentStats1.setTeamEntity(teamStats1.getTeam());
             TeamTournamentStats teamTournamentStats2 =  teamMap.getOrDefault(teamStats2.getTeam(), new TeamTournamentStats());
-            teamTournamentStats2.setTeam(teamStats2.getTeam());
+            teamTournamentStats2.setTeamEntity(teamStats2.getTeam());
 
             teamTournamentStats1.setSeason(match.getSeason());
             teamTournamentStats1.setPlayed(teamTournamentStats1.getPlayed() + 1);
@@ -87,80 +101,68 @@ public class MatchService {
         return new HashSet<>(teamMap.values());
     }
 
-    public Match finishMatch(Long id, MatchFinishRequestDto request) {
-        Match match = findById(id);
-        Team team1 = match.getStats().getFirst().getTeam();
-        Team team2 = match.getStats().getLast().getTeam();
-        if (!isCorrectTeam(team1, request)) {
+    @Transactional
+    public MatchEntity finishMatch(Long id, MatchFinish matchFinish) {
+        MatchEntity matchEntity = findById(id);
+        TeamEntity teamEntity1 = matchEntity.getStats().getFirst().getTeam();
+        TeamEntity teamEntity2 = matchEntity.getStats().getLast().getTeam();
+        if (!isCorrectTeam(teamEntity1, matchFinish)) {
             throw new IllegalStateException("Invalid team IDs were provided for an existing match.");
         }
-        if (!isCorrectTeam(team2, request)) {
+        if (!isCorrectTeam(teamEntity2, matchFinish)) {
             throw new IllegalStateException("Invalid team IDs were provided for an existing match.");
-
         }
 
-        List<MatchStats> matchStats = getMatchStats(request, match);
-        match.setFinished(true);
-        match.setStats(matchStats);
-        return matchRepository.save(match);
+        updateMatchStats(matchFinish, matchEntity);
+        matchEntity.setFinished(true);
+        return matchRepository.save(matchEntity);
     }
 
-    private List<MatchStats> getMatchStats(MatchFinishRequestDto request, Match match) {
-        MatchStats.MatchStatsBuilder matchStatsBuilder1 = MatchStats.builder();
-        matchStatsBuilder1.match(match);
-        MatchStats.MatchStatsBuilder matchStatsBuilder2 = MatchStats.builder();
-        matchStatsBuilder2.match(match);
-        if (request.team1().goals() == request.team2().goals()) {
-            matchStatsBuilder1.isWinner(false);
-            matchStatsBuilder1.score(1);
-            matchStatsBuilder1.goals(request.team1().goals());
-            matchStatsBuilder1.team(teamService.findById(request.team1().teamId()));
-            matchStatsBuilder1.isGuest(isGuest(request.team1(), match));
+    private void updateMatchStats(MatchFinish matchFinish, MatchEntity matchEntity) {
+        for (MatchStatsEntity stats : matchEntity.getStats()) {
+            MatchTeamResult team1 = matchFinish.getTeam1();
+            MatchTeamResult team2 = matchFinish.getTeam2();
+            if (stats.getTeam().getId().equals(team1.getTeamId().id())) {
+                stats.setGoals(team1.getGoals());
+                stats.setScore(calculateScore(team1.getGoals(), team2.getGoals()));
+                stats.setIsWinner(team1.getGoals() > team2.getGoals());
+                stats.setGuest(isGuest(team1, matchEntity));
+            } else if (stats.getTeam().getId().equals(team2.getTeamId().id())) {
+                stats.setGoals(team2.getGoals());
+                stats.setScore(calculateScore(team2.getGoals(), team1.getGoals()));
+                stats.setIsWinner(team2.getGoals() > team1.getGoals());
+                stats.setGuest(isGuest(team2, matchEntity));
+            }
+        }
+    }
 
-            matchStatsBuilder2.isWinner(false);
-            matchStatsBuilder2.score(1);
-            matchStatsBuilder2.goals(request.team2().goals());
-            matchStatsBuilder2.team(teamService.findById(request.team2().teamId()));
-            matchStatsBuilder2.isGuest(isGuest(request.team2(), match));
-
-        } else if (request.team1().goals() > request.team2().goals()) {
-            matchStatsBuilder1.isWinner(true);
-            matchStatsBuilder1.team(teamService.findById(request.team1().teamId()));
-            matchStatsBuilder1.goals(request.team1().goals());
-            matchStatsBuilder1.score(3);
-            matchStatsBuilder1.isGuest(isGuest(request.team1(), match));
-
-            matchStatsBuilder2.isWinner(false);
-            matchStatsBuilder2.team(teamService.findById(request.team2().teamId()));
-            matchStatsBuilder2.goals(request.team2().goals());
-            matchStatsBuilder2.score(0);
-            matchStatsBuilder2.isGuest(isGuest(request.team2(), match));
+    private int calculateScore(int goalsFor, int goalsAgainst) {
+        if (goalsFor > goalsAgainst) {
+            return 3;
+        } else if (goalsFor == goalsAgainst) {
+            return 1;
         } else {
-            matchStatsBuilder1.isWinner(false);
-            matchStatsBuilder1.team(teamService.findById(request.team1().teamId()));
-            matchStatsBuilder1.goals(request.team1().goals());
-            matchStatsBuilder1.score(0);
-            matchStatsBuilder1.isGuest(isGuest(request.team1(), match));
-
-            matchStatsBuilder2.isWinner(true);
-            matchStatsBuilder2.team(teamService.findById(request.team2().teamId()));
-            matchStatsBuilder2.goals(request.team2().goals());
-            matchStatsBuilder2.score(3);
-            matchStatsBuilder2.isGuest(isGuest(request.team2(), match));
+            return 0;
         }
-
-        List<MatchStats> matchStats = new ArrayList<>();
-        matchStats.add(matchStatsBuilder1.build());
-        matchStats.add(matchStatsBuilder2.build());
-        return matchStats;
     }
 
-    private boolean isGuest(TeamDto team1, Match match) {
-        return match.getStats().stream().anyMatch(s -> s.getTeam().getId().equals(team1.teamId()) && s.isGuest());
+    private boolean isGuest(MatchTeamResult team, MatchEntity matchEntity) {
+        return matchEntity.getStats().stream().anyMatch(s -> s.getTeam().getId().equals(team.getTeamId().id()) && s.isGuest());
     }
 
-    private boolean isCorrectTeam(Team team, MatchFinishRequestDto request) {
-        List<Long> ids = List.of(request.team1().teamId(), request.team2().teamId());
-        return ids.contains(team.getId());
+    private boolean isCorrectTeam(TeamEntity teamEntity, MatchFinish request) {
+        List<Long> ids = List.of(request.getTeam1().getTeamId().id(), request.getTeam2().getTeamId().id());
+        return ids.contains(teamEntity.getId());
+    }
+
+    private MatchStatsEntity createStats(Team team) {
+        Long teamId = team.getTeamId().id();
+        boolean teamIsGuest = team.isGuest();
+        TeamEntity teamEntity = teamService.findById(teamId);
+
+        return MatchStatsEntity.builder()
+                .team(teamEntity)
+                .isGuest(teamIsGuest)
+                .build();
     }
 }

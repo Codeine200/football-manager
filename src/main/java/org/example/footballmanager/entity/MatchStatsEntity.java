@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MatchStats {
+public class MatchStatsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "match_stats_id_seq")
@@ -36,7 +36,7 @@ public class MatchStats {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
-    private Team team;
+    private TeamEntity team;
 
     @Column(name = "is_guest")
     private boolean isGuest;
@@ -52,5 +52,5 @@ public class MatchStats {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
-    private Match match;
+    private MatchEntity match;
 }

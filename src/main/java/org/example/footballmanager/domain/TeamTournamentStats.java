@@ -1,17 +1,17 @@
-package org.example.footballmanager.model;
+package org.example.footballmanager.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.entity.TeamEntity;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamTournamentStats {
-    Team team;
+    TeamEntity teamEntity;
     String season;
     Integer played = 0;
     Integer wins = 0;

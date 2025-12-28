@@ -26,7 +26,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Match {
+public class MatchEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "matches_id_seq")
@@ -47,10 +47,11 @@ public class Match {
     private boolean isFinished;
 
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
-    private List<MatchStats> stats = new ArrayList<>();
+    @Builder.Default
+    private List<MatchStatsEntity> stats = new ArrayList<>();
 
-    public void addStats(MatchStats matchStats) {
-        stats.add(matchStats);
-        matchStats.setMatch(this);
+    public void addStats(MatchStatsEntity matchStatsEntity) {
+        stats.add(matchStatsEntity);
+        matchStatsEntity.setMatch(this);
     }
 }

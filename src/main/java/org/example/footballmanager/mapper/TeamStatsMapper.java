@@ -1,7 +1,7 @@
 package org.example.footballmanager.mapper;
 
 import org.example.footballmanager.dto.response.MatchResponseDto;
-import org.example.footballmanager.entity.MatchStats;
+import org.example.footballmanager.entity.MatchStatsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -13,5 +13,5 @@ public interface TeamStatsMapper {
 
     @Mapping(target = "teamId", source = "team.id")
     @Mapping(target = "teamName", source = "team.name")
-    MatchResponseDto.TeamStatsDto toDto(MatchStats stats);
+    MatchResponseDto.TeamStatsDto toDto(MatchStatsEntity stats);
 }

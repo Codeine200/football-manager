@@ -1,7 +1,7 @@
 package org.example.footballmanager.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.footballmanager.entity.Team;
+import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.TeamNotFoundException;
 import org.example.footballmanager.repository.TeamRepository;
 import org.springframework.data.domain.Page;
@@ -14,23 +14,23 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
 
-    public Team save(Team team) {
-        return teamRepository.save(team);
+    public TeamEntity save(TeamEntity teamEntity) {
+        return teamRepository.save(teamEntity);
     }
 
-    public Team findById(Long id) {
+    public TeamEntity findById(Long id) {
         return teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
     }
 
-    public Page<Team> findAll(Pageable pageable) {
+    public Page<TeamEntity> findAll(Pageable pageable) {
         return teamRepository
                 .findAll(pageable);
     }
 
     public void deleteById(Long id) {
-        Team team = teamRepository.findById(id)
+        TeamEntity teamEntity = teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
-        teamRepository.delete(team);
+        teamRepository.delete(teamEntity);
     }
 }
