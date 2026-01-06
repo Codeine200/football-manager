@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+    postgres:
+        image: postgres:16
+        container_name: football-postgres
+        environment:
+            POSTGRES_DB: football_manager
+            POSTGRES_USER: football_admin
+            POSTGRES_PASSWORD: secret
+        ports:
+            - "5433:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U football_admin -d football_manager"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+    app:
+        build: .
+        container_name: football-manager-app
+        depends_on:
+            postgres:
+                condition: service_healthy
+        environment:
+            SPRING_PROFILES_ACTIVE: docker
+        ports:
+            - "8080:8080"
+
+volumes:
+    postgres_data:
