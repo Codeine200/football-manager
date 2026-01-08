@@ -93,4 +93,10 @@ public class PlayerFacade {
         PlayerEntity saved = playerService.assign(playerId, new TeamId(dto.teamId()));
         return playerMapper.toDto(saved);
     }
+
+    @CachePut(value = "players", key = "#id")
+    @CacheEvict(value = "players-page", allEntries = true)
+    public void deleteById(Long id) {
+        playerService.deleteById(id);
+    }
 }

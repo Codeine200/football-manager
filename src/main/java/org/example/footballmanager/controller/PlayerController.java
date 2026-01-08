@@ -7,7 +7,6 @@ import org.example.footballmanager.dto.request.PlayerRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
 import org.example.footballmanager.facade.PlayerFacade;
-import org.example.footballmanager.service.PlayerService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PlayerController {
 
-    private final PlayerService playerService;
     private final PlayerFacade playerFacade;
 
     @GetMapping
@@ -65,7 +63,7 @@ public class PlayerController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        playerService.deleteById(id);
+        playerFacade.deleteById(id);
     }
 }
 

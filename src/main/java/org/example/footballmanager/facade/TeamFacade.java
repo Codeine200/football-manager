@@ -11,6 +11,7 @@ import org.example.footballmanager.service.TeamService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -49,16 +50,27 @@ public class TeamFacade {
         return teamMapper.toDto(savedTeamEntity);
     }
 
-    @CachePut(value = "teams", key = "#id")
-    @CacheEvict(value = "teams-page", allEntries = true)
+    @Caching(
+            put = @CachePut(value = "teams", key = "#id"),
+            evict = {
+                    @CacheEvict(value = "teams-page", allEntries = true),
+                    @CacheEvict(value = "players-page", allEntries = true)
+            }
+    )
     public TeamResponseDto update(Long id, TeamRequestDto dto) {
         TeamEntity teamEntity = teamService.findById(id);
         teamMapper.updateFromDto(dto, teamEntity);
         return teamMapper.toDto(teamService.save(teamEntity));
     }
 
-    @CachePut(value = "teams", key = "#id")
-    @CacheEvict(value = "teams-page", allEntries = true)
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "teams", key = "#id"),
+                    @CacheEvict(value = "teams-page", allEntries = true),
+                    @CacheEvict(value = "players-page", allEntries = true),
+                    @CacheEvict(value = "players", allEntries = true)
+            }
+    )
     public void deleteById(Long id) {
         teamService.deleteById(id);
     }
