@@ -42,10 +42,7 @@ public class TeamFacade {
         return pageMapper.toDto(page);
     }
 
-    @CacheEvict(
-            value = { "teams", "teams-page" },
-            allEntries = true
-    )
+    @CacheEvict(value = "teams-page", allEntries = true)
     public TeamResponseDto save(TeamRequestDto requestDto) {
         TeamEntity teamEntity = teamMapper.toEntity(requestDto);
         TeamEntity savedTeamEntity = teamService.save(teamEntity);

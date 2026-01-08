@@ -14,6 +14,9 @@ import org.example.footballmanager.mapper.PageMapper;
 import org.example.footballmanager.mapper.PlayerMapper;
 import org.example.footballmanager.service.PlayerService;
 import org.example.footballmanager.service.TeamService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -28,12 +31,20 @@ public class PlayerFacade {
     private final PageMapper pageMapper;
 
     @Transactional
+    @Cacheable(value = "players", key = "#id")
     public PlayerResponseDto findById(Long id) {
         PlayerEntity playerEntity = playerService.findById(id);
         return playerMapper.toDto(playerEntity);
     }
 
     @Transactional
+    @Cacheable(
+            value = "players-page",
+            key = "'team=' + #teamId + " +
+                    "'&p=' + #pageable.pageNumber + " +
+                    "'&s=' + #pageable.pageSize + " +
+                    "'&sort=' + #pageable.sort"
+    )
     public PageResponse<PlayerResponseDto> findAllByTeamId(Long teamId, Pageable pageable) {
         if (teamId == null) {
             Page<PlayerResponseDto> page = playerService
@@ -51,6 +62,7 @@ public class PlayerFacade {
     }
 
     @Transactional
+    @CacheEvict(value = "players-page", allEntries = true)
     public PlayerResponseDto create(PlayerRequestDto dto) {
         Player player = playerMapper.toDomain(dto);
         PlayerEntity saved = playerService.create(player);
@@ -58,6 +70,8 @@ public class PlayerFacade {
     }
 
     @Transactional
+    @CachePut(value = "players", key = "#playerId")
+    @CacheEvict(value = "players-page", allEntries = true)
     public PlayerResponseDto update(Long playerId, PlayerRequestDto dto) {
         PlayerEntity playerEntity = playerService.findById(playerId);
 
@@ -73,6 +87,8 @@ public class PlayerFacade {
     }
 
     @Transactional
+    @CachePut(value = "players", key = "#playerId")
+    @CacheEvict(value = "players-page", allEntries = true)
     public PlayerResponseDto assign(Long playerId, PlayerAssignRequestDto dto) {
         PlayerEntity saved = playerService.assign(playerId, new TeamId(dto.teamId()));
         return playerMapper.toDto(saved);

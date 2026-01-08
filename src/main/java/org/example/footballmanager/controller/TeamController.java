@@ -6,7 +6,6 @@ import org.example.footballmanager.dto.request.TeamRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.facade.TeamFacade;
-import org.example.footballmanager.service.TeamService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TeamController {
 
-    private final TeamService teamService;
     private final TeamFacade teamFacade;
 
     @GetMapping
