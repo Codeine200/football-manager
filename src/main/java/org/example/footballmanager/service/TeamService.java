@@ -1,5 +1,6 @@
 package org.example.footballmanager.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.TeamNotFoundException;
@@ -28,9 +29,12 @@ public class TeamService {
                 .findAll(pageable);
     }
 
+    @Transactional
     public void deleteById(Long id) {
         TeamEntity teamEntity = teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
+        teamEntity.getPlayers()
+                .forEach(player -> player.setTeam(null));
         teamRepository.delete(teamEntity);
     }
 }

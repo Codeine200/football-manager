@@ -38,5 +38,5 @@ public class TeamEntity {
     private String name;
 
     @OneToMany(mappedBy = "team")
-    private List<PlayerEntity> playerEntities;
+    private List<PlayerEntity> players;
 }

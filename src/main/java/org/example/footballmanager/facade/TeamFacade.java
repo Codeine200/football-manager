@@ -59,4 +59,10 @@ public class TeamFacade {
         teamMapper.updateFromDto(dto, teamEntity);
         return teamMapper.toDto(teamService.save(teamEntity));
     }
+
+    @CachePut(value = "teams", key = "#id")
+    @CacheEvict(value = "teams-page", allEntries = true)
+    public void deleteById(Long id) {
+        teamService.deleteById(id);
+    }
 }
