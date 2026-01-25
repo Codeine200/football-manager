@@ -31,4 +31,8 @@ public class MatchFacade {
         MatchFinish matchFinish = matchMapper.toDomain(request);
         return matchMapper.toDto(matchService.finishMatch(id, matchFinish));
     }
+
+    public void deleteById(Long id) {
+        matchService.deleteById(id);
+    }
 }

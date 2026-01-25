@@ -46,7 +46,7 @@ public class MatchEntity {
     @Column(name = "is_finished")
     private boolean isFinished;
 
-    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MatchStatsEntity> stats = new ArrayList<>();
 

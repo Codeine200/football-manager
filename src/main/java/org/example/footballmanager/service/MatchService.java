@@ -165,4 +165,11 @@ public class MatchService {
                 .isGuest(teamIsGuest)
                 .build();
     }
+
+    @Transactional
+    public void deleteById(Long id) {
+        MatchEntity matchEntity = matchRepository.findById(id)
+                .orElseThrow(() -> new MatchNotFoundException(id));
+        matchRepository.delete(matchEntity);
+    }
 }

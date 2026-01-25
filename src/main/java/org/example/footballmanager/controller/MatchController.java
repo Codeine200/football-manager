@@ -7,6 +7,7 @@ import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.facade.MatchFacade;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,5 +32,11 @@ public class MatchController {
     @ResponseStatus(HttpStatus.OK)
     public MatchResponseDto finishMatch(@PathVariable Long id, @RequestBody MatchFinishRequestDto request) {
         return matchFacade.finishMatch(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        matchFacade.deleteById(id);
     }
 }

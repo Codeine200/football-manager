@@ -116,4 +116,7 @@ Content-Type: application/json
   }
 }
 
+### Delete a matche
+DELETE http://localhost:8080/api/v1/matches/1
+
 
