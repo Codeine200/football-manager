@@ -5,8 +5,8 @@ import org.example.footballmanager.domain.MatchFinish;
 import org.example.footballmanager.domain.MatchTeamResult;
 import org.example.footballmanager.domain.Team;
 import org.example.footballmanager.domain.TeamId;
-import org.example.footballmanager.dto.request.MatchCreateRequestDto;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
+import org.example.footballmanager.dto.request.MatchRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.entity.MatchEntity;
 import org.example.footballmanager.entity.MatchStatsEntity;
@@ -30,9 +30,9 @@ public interface MatchMapper {
 
     @Mapping(target = "team1", expression = "java(mapTeam(dto.getTeam1()))")
     @Mapping(target = "team2", expression = "java(mapTeam(dto.getTeam2()))")
-    Match toDomain(MatchCreateRequestDto dto);
+    Match toDomain(MatchRequestDto dto);
 
-    default Team mapTeam(MatchCreateRequestDto.TeamDto dto) {
+    default Team mapTeam(MatchRequestDto.TeamDto dto) {
         return new Team(
                 new TeamId(dto.getId()),
                 dto.isGuest()

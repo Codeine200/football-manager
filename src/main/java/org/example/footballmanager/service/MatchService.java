@@ -13,6 +13,8 @@ import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.MatchNotFoundException;
 import org.example.footballmanager.mapper.MatchMapper;
 import org.example.footballmanager.repository.MatchRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -33,6 +35,11 @@ public class MatchService {
     public MatchEntity findById(Long id) {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new MatchNotFoundException(id));
+    }
+
+    public Page<MatchEntity> findAll(Pageable pageable) {
+        return matchRepository
+                .findAll(pageable);
     }
 
     public MatchEntity createMatch(Match matchCreate) {

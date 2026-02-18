@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class MatchCreateRequestDto {
+public class MatchRequestDto {
     @NotNull
     private Long season;
     @NotNull
