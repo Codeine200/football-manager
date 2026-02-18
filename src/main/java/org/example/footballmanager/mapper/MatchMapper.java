@@ -2,11 +2,14 @@ package org.example.footballmanager.mapper;
 
 import org.example.footballmanager.domain.Match;
 import org.example.footballmanager.domain.MatchFinish;
+import org.example.footballmanager.domain.MatchFullInfo;
 import org.example.footballmanager.domain.MatchTeamResult;
 import org.example.footballmanager.domain.Team;
+import org.example.footballmanager.domain.TeamFullInfo;
 import org.example.footballmanager.domain.TeamId;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.request.MatchRequestDto;
+import org.example.footballmanager.dto.request.MatchUpdateRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.entity.MatchEntity;
 import org.example.footballmanager.entity.MatchStatsEntity;
@@ -42,6 +45,13 @@ public interface MatchMapper {
     @Mapping(target = "team1", source = "match", qualifiedByName = "mapTeam1")
     @Mapping(target = "team2", source = "match", qualifiedByName = "mapTeam2")
     MatchResponseDto toDto(MatchEntity match);
+
+    @Mapping(target = "team1", source = "team1")
+    @Mapping(target = "team2", source = "team2")
+    MatchFullInfo toDomain(MatchUpdateRequestDto dto);
+
+    @Mapping(target = "teamId", source = "id")
+    TeamFullInfo toDomain(MatchUpdateRequestDto.TeamDto dto);
 
     @Named("mapTeam1")
     default MatchResponseDto.TeamStatsDto mapTeam1(MatchEntity matchEntity) {

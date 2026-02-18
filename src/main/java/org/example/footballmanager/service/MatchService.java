@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.domain.Match;
 import org.example.footballmanager.domain.MatchFinish;
+import org.example.footballmanager.domain.MatchFullInfo;
 import org.example.footballmanager.domain.MatchTeamResult;
 import org.example.footballmanager.domain.Team;
 import org.example.footballmanager.domain.TeamTournamentStats;
@@ -13,6 +14,7 @@ import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.MatchNotFoundException;
 import org.example.footballmanager.mapper.MatchMapper;
 import org.example.footballmanager.repository.MatchRepository;
+import org.example.footballmanager.repository.MatchStatsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.util.Set;
 public class MatchService {
 
     private final MatchRepository matchRepository;
+    private final MatchStatsRepository matchStatsRepository;
     private final MatchMapper matchMapper;
     private final TeamService teamService;
 
@@ -123,6 +126,15 @@ public class MatchService {
         updateMatchStats(matchFinish, matchEntity);
         matchEntity.setFinished(true);
         return matchRepository.save(matchEntity);
+    }
+
+    @Transactional
+    public MatchEntity updateMatch(Long idMatch, MatchFullInfo newMatchFullInfo) {
+        MatchEntity matchEntity = findById(idMatch);
+
+        if (!newMatchFullInfo.isFinished() && matchEntity.isFinished())_{
+            matchStatsRepository.deleteByMatchId(idMatch);
+        }
     }
 
     private void updateMatchStats(MatchFinish matchFinish, MatchEntity matchEntity) {

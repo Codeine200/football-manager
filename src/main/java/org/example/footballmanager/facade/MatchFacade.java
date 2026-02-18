@@ -4,8 +4,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.domain.Match;
 import org.example.footballmanager.domain.MatchFinish;
+import org.example.footballmanager.domain.MatchFullInfo;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.request.MatchRequestDto;
+import org.example.footballmanager.dto.request.MatchUpdateRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.entity.MatchEntity;
@@ -34,7 +36,7 @@ public class MatchFacade {
     }
 
     @Cacheable(
-            value = "matches-pages",
+            value = "matches-page",
             key = "'p=' + #pageable.pageNumber + " +
                     "'&s=' + #pageable.pageSize + " +
                     "'&sort=' + #pageable.sort"
@@ -83,9 +85,8 @@ public class MatchFacade {
                     @CacheEvict(value = "matches-page", allEntries = true),
             }
     )
-    public MatchResponseDto update(Long id, MatchRequestDto dto) {
-        MatchEntity matchEntity = matchService.findById(id);
-        matchMapper.updateFromDto(dto, matchEntity);
-        return matchMapper.toDto(matchService.save(matchEntity));
+    public MatchResponseDto update(Long id, MatchUpdateRequestDto dto) {
+        MatchFullInfo newMatch = matchMapper.toDomain(dto);
+        return matchMapper.toDto(matchService.updateMatch(id, newMatch));
     }
 }

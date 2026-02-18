@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.request.MatchRequestDto;
+import org.example.footballmanager.dto.request.MatchUpdateRequestDto;
 import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.facade.MatchFacade;
@@ -52,7 +53,7 @@ public class MatchController {
 
     @PutMapping("/{id}")
     public MatchResponseDto update(@PathVariable Long id,
-                                  @RequestBody @Valid MatchRequestDto dto) {
+                                  @RequestBody @Valid MatchUpdateRequestDto dto) {
         return matchFacade.update(id, dto);
     }
 }
