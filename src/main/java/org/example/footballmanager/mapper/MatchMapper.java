@@ -15,6 +15,7 @@ import org.example.footballmanager.entity.MatchEntity;
 import org.example.footballmanager.entity.MatchStatsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 
@@ -53,6 +54,10 @@ public interface MatchMapper {
     @Mapping(target = "teamId", source = "id")
     TeamFullInfo toDomain(MatchUpdateRequestDto.TeamDto dto);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "stats", ignore = true)
+    void updateFromMatchFullInfo(MatchFullInfo matchFullInfo, @MappingTarget MatchEntity entity);
+
     @Named("mapTeam1")
     default MatchResponseDto.TeamStatsDto mapTeam1(MatchEntity matchEntity) {
         return matchEntity.getStats().stream()
@@ -69,5 +74,9 @@ public interface MatchMapper {
                 .findFirst()
                 .map(TeamStatsMapper.INSTANCE::toDto)
                 .orElse(null);
+    }
+
+    default TeamId map(Long value) {
+        return value == null ? null : new TeamId(value);
     }
 }

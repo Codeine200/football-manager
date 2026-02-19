@@ -68,7 +68,9 @@ public class TeamFacade {
                     @CacheEvict(value = "teams", key = "#id"),
                     @CacheEvict(value = "teams-page", allEntries = true),
                     @CacheEvict(value = "players-page", allEntries = true),
-                    @CacheEvict(value = "players", allEntries = true)
+                    @CacheEvict(value = "players", allEntries = true),
+                    @CacheEvict(value = "matches", allEntries = true),
+                    @CacheEvict(value = "matches-page", allEntries = true),
             }
     )
     public void deleteById(Long id) {

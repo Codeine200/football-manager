@@ -31,7 +31,7 @@ public class MatchEntityTests {
 
     @Test
     void shouldReturnFullStatisticForAllTeamBySeason() {
-        String season = "2024";
+        Integer season = 2024;
 
         MatchEntity matchEntity = new MatchEntity();
         matchEntity.setSeason(season);

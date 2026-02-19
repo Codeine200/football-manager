@@ -63,7 +63,7 @@ public class FinishMatchTestsEntity {
         TeamEntity teamEntity2 = teamRepository.save(TeamEntity.builder().name("Team B").build());
 
         MatchEntity matchEntity = MatchEntity.builder()
-                .season("2025")
+                .season(2025)
                 .matchDate(LocalDate.now())
                 .stats(new ArrayList<>())
                 .build();

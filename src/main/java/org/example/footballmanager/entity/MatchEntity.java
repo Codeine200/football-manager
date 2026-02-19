@@ -37,8 +37,8 @@ public class MatchEntity {
     )
     private Long id;
 
-    @Column(nullable = false, length = 20)
-    private String season;
+    @Column(nullable = false)
+    private Integer season;
 
     @Column(name = "match_date", nullable = false)
     private LocalDate matchDate;

@@ -59,7 +59,7 @@ public class MatchService {
         return matchRepository.save(matchEntity);
     }
 
-    public Set<TeamTournamentStats> getTeamStatsBySeason(String season) {
+    public Set<TeamTournamentStats> getTeamStatsBySeason(Integer season) {
         List<MatchEntity> matchEntities = matchRepository.findAllBySeason(season);
         if (matchEntities.isEmpty()) {
             return Collections.emptySet();
@@ -132,9 +132,13 @@ public class MatchService {
     public MatchEntity updateMatch(Long idMatch, MatchFullInfo newMatchFullInfo) {
         MatchEntity matchEntity = findById(idMatch);
 
-        if (!newMatchFullInfo.isFinished() && matchEntity.isFinished())_{
+        if (!newMatchFullInfo.isFinished() && matchEntity.isFinished()) {
             matchStatsRepository.deleteByMatchId(idMatch);
+            matchMapper.updateFromMatchFullInfo(newMatchFullInfo, matchEntity);
+            return matchRepository.save(matchEntity);
         }
+
+        return matchEntity;
     }
 
     private void updateMatchStats(MatchFinish matchFinish, MatchEntity matchEntity) {
@@ -191,4 +195,5 @@ public class MatchService {
                 .orElseThrow(() -> new MatchNotFoundException(id));
         matchRepository.delete(matchEntity);
     }
+
 }

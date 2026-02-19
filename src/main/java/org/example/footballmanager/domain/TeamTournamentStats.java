@@ -12,7 +12,7 @@ import org.example.footballmanager.entity.TeamEntity;
 @AllArgsConstructor
 public class TeamTournamentStats {
     TeamEntity teamEntity;
-    String season;
+    Integer season;
     Integer played = 0;
     Integer wins = 0;
     Integer draws = 0;

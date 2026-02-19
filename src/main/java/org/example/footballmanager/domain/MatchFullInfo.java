@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Getter
 public class MatchFullInfo {
 
-    private final Long season;
+    private final Integer season;
     private final LocalDate matchDate;
     private final TeamFullInfo team1;
     private final TeamFullInfo team2;
@@ -16,7 +16,7 @@ public class MatchFullInfo {
 
     @Builder
     public MatchFullInfo(
-            Long season,
+            Integer season,
             LocalDate matchDate,
             TeamFullInfo team1,
             TeamFullInfo team2,
@@ -44,6 +44,4 @@ public class MatchFullInfo {
         this.team2 = team2;
         this.isFinished = isFinished;
     }
-
-
 }
