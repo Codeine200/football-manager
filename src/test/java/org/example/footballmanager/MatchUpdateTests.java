@@ -21,6 +21,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 @Testcontainers
@@ -83,7 +84,9 @@ public class MatchUpdateTests {
         MatchEntity updated = matchRepository.findById(matchId).orElseThrow();
 
         assertEquals(2026, updated.getSeason());
-        assertEquals(3, updated.getStats().getFirst().getScore());
+        assertNull(updated.getStats().getFirst().getScore());
+        assertNull(updated.getStats().getFirst().getGoals());
+        assertNull(updated.getStats().getFirst().getIsWinner());
         assertFalse(updated.isFinished());
     }
 }

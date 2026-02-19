@@ -133,12 +133,21 @@ public class MatchService {
         MatchEntity matchEntity = findById(idMatch);
 
         if (!newMatchFullInfo.isFinished() && matchEntity.isFinished()) {
-            matchStatsRepository.deleteByMatchId(idMatch);
             matchMapper.updateFromMatchFullInfo(newMatchFullInfo, matchEntity);
+            clearMatchesStats(matchEntity);
             return matchRepository.save(matchEntity);
         }
 
         return matchEntity;
+    }
+
+    private void clearMatchesStats(MatchEntity matchEntity) {
+        matchEntity.getStats().forEach(matchStatsEntity -> {
+            matchStatsEntity.setGoals(null);
+            matchStatsEntity.setScore(null);
+            matchStatsEntity.setIsWinner(null);
+        });
+
     }
 
     private void updateMatchStats(MatchFinish matchFinish, MatchEntity matchEntity) {
