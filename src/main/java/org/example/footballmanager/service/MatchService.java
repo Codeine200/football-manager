@@ -7,6 +7,8 @@ import org.example.footballmanager.domain.MatchFinish;
 import org.example.footballmanager.domain.MatchFullInfo;
 import org.example.footballmanager.domain.MatchTeamResult;
 import org.example.footballmanager.domain.Team;
+import org.example.footballmanager.domain.TeamFullInfo;
+import org.example.footballmanager.domain.TeamId;
 import org.example.footballmanager.domain.TeamTournamentStats;
 import org.example.footballmanager.entity.MatchEntity;
 import org.example.footballmanager.entity.MatchStatsEntity;
@@ -132,13 +134,32 @@ public class MatchService {
     public MatchEntity updateMatch(Long idMatch, MatchFullInfo newMatchFullInfo) {
         MatchEntity matchEntity = findById(idMatch);
 
-        if (!newMatchFullInfo.isFinished() && matchEntity.isFinished()) {
-            matchMapper.updateFromMatchFullInfo(newMatchFullInfo, matchEntity);
+        matchMapper.updateFromMatchFullInfo(newMatchFullInfo, matchEntity);
+        if (!newMatchFullInfo.isFinished()) {
             clearMatchesStats(matchEntity);
             return matchRepository.save(matchEntity);
         }
+        matchEntity.getStats().clear();
+        TeamFullInfo team1 = newMatchFullInfo.getTeam1();
+        matchEntity.getStats().add(
+                MatchStatsEntity.builder().team(teamService.findById(team1.getTeamId().id()))
+                        .goals(team1.getGoals()).build());
 
+        matchEntity.getStats().add(
+                new MatchStatsEntity(matchEntity, team2, dto.getTeam2().getGoals(), ...)
+    );
+        recalculateStats(matchEntity);
         return matchEntity;
+    }
+
+    private void recalculateStats(MatchEntity matchEntity) {
+        MatchStatsEntity teamStats1 = matchEntity.getStats().getFirst();
+        MatchStatsEntity teamStats2 = matchEntity.getStats().getLast();
+        MatchFinish matchFinish = new MatchFinish(
+                new MatchTeamResult(new TeamId(teamStats1.getId()), teamStats1.getGoals()),
+                new MatchTeamResult(new TeamId(teamStats2.getId()), teamStats2.getGoals())
+        );
+        updateMatchStats(matchFinish, matchEntity);
     }
 
     private void clearMatchesStats(MatchEntity matchEntity) {
@@ -147,7 +168,6 @@ public class MatchService {
             matchStatsEntity.setScore(null);
             matchStatsEntity.setIsWinner(null);
         });
-
     }
 
     private void updateMatchStats(MatchFinish matchFinish, MatchEntity matchEntity) {

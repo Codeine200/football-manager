@@ -55,17 +55,26 @@ public class MatchUpdateTests {
     private MatchRepository matchRepository;
 
 
-//    @Test
-//    void shouldUpdateMatchWhenMatchIsNotFinished() {
-//        MatchFullInfo update = MatchFullInfo.builder()
-//                .season(2026L)
-//                .matchDate(LocalDate.of(2026,1,1))
-//                .isFinished(false)
-//                .build();
-//
-//        long matchId = 1L;
-//        matchService.updateMatch(matchId, update);
-//    }
+    @Test
+    @Transactional
+    void shouldUpdateMatchWhenMatchIsNotFinished() {
+        MatchFullInfo update = MatchFullInfo.builder()
+                .season(2026)
+                .matchDate(LocalDate.of(2026,1,1))
+                .isFinished(true)
+                .team1(new TeamFullInfo(new TeamId(1L), 2, false))
+                .team2(new TeamFullInfo(new TeamId(2L), 5, true))
+                .build();
+
+        long matchId = 1L;
+        matchService.updateMatch(matchId, update);
+
+        MatchEntity updated = matchRepository.findById(matchId).orElseThrow();
+
+        assertEquals(2026, updated.getSeason());
+        assertEquals(false, updated.getStats().getFirst().getIsWinner());
+        assertEquals(true, updated.getStats().getLast().getIsWinner());
+    }
 
     @Test
     @Transactional

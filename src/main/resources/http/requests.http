@@ -119,4 +119,25 @@ Content-Type: application/json
 ### Delete a matche
 DELETE http://localhost:8080/api/v1/matches/1
 
+### Update the matche
+PUT http://localhost:8080/api/v1/matches/1
+Content-Type: application/json
+
+{
+  "season": 2026,
+  "matchDate": "2026-03-10",
+  "team1": {
+    "id": 2,
+    "isGuest": false,
+    "goals": 2
+  },
+  "team2": {
+    "id": 3,
+    "isGuest": true,
+    "goals": 5
+  },
+  "isFinished": true
+}
+
+
 
