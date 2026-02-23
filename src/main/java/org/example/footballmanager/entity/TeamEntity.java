@@ -37,6 +37,9 @@ public class TeamEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "logo")
+    private String logo;
+
     @OneToMany(mappedBy = "team")
     private List<PlayerEntity> players;
 }

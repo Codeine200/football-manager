@@ -1,9 +1,11 @@
 package org.example.footballmanager.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.config.UploadProperties;
+import org.example.footballmanager.exception.FileNotFoundException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,20 +19,21 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/files")
+@RequiredArgsConstructor
 public class FileController {
-
-    private final Path uploadFolder = Paths.get("/football-manager/uploads");
+    private final UploadProperties cfg;
 
     @GetMapping("/{filename}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) throws IOException {
-        Path file = uploadFolder.resolve(filename).normalize();
+        Path uploadFolder = Paths.get(cfg.getFolder());
+        Path file = Paths.get(cfg.getFolder()).resolve(filename).normalize();
         if (!file.startsWith(uploadFolder)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new FileNotFoundException("File not found");
         }
 
         Resource resource = new UrlResource(file.toUri());
         if (!resource.exists() || !resource.isReadable()) {
-            return ResponseEntity.notFound().build();
+            throw new FileNotFoundException("File not found");
         }
 
         String contentType = Files.probeContentType(file);

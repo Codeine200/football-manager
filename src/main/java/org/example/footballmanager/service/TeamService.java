@@ -11,6 +11,7 @@ import org.example.footballmanager.repository.TeamRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,9 +23,16 @@ public class TeamService {
     private final PlayerRepository playerRepository;
     private final MatchRepository matchRepository;
     private final MatchStatsRepository matchStatsRepository;
+    private final FileStorageService fileStorageService;
 
-    public TeamEntity save(TeamEntity teamEntity) {
-        return teamRepository.save(teamEntity);
+    public TeamEntity save(TeamEntity teamEntity, MultipartFile file) {
+        TeamEntity savedTeamEntity = teamRepository.save(teamEntity);
+        if (file != null && !file.isEmpty()) {
+            String savedFileName = fileStorageService.saveFile(file, savedTeamEntity.getId().toString());
+            savedTeamEntity.setLogo(savedFileName);
+            teamRepository.save(savedTeamEntity);
+        }
+        return teamEntity;
     }
 
     public TeamEntity findById(Long id) {

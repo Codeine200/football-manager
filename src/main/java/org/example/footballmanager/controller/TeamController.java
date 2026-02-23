@@ -8,6 +8,7 @@ import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.facade.TeamFacade;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,11 +38,15 @@ public class TeamController {
         return teamFacade.findById(id);
     }
 
-    @PostMapping
+    @PostMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
-    public TeamResponseDto create(@RequestBody @Valid TeamRequestDto dto,
-                                  @RequestPart(value = "file", required = false) MultipartFile file ) {
-        return teamFacade.save(dto);
+    public TeamResponseDto create(
+            @RequestPart("team") @Valid TeamRequestDto dto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+
+        return teamFacade.save(dto, file);
     }
 
     @PutMapping("/{id}")

@@ -42,6 +42,11 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDto(400, "Validation failed", fieldErrors));
     }
 
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileNotFound(FileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDto(404, ex.getMessage()));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleAll(Exception ex) {

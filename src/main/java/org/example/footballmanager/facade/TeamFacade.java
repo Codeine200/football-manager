@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
@@ -44,9 +45,9 @@ public class TeamFacade {
     }
 
     @CacheEvict(value = "teams-page", allEntries = true)
-    public TeamResponseDto save(TeamRequestDto requestDto) {
+    public TeamResponseDto save(TeamRequestDto requestDto, MultipartFile file) {
         TeamEntity teamEntity = teamMapper.toEntity(requestDto);
-        TeamEntity savedTeamEntity = teamService.save(teamEntity);
+        TeamEntity savedTeamEntity = teamService.save(teamEntity, file);
         return teamMapper.toDto(savedTeamEntity);
     }
 
@@ -60,7 +61,7 @@ public class TeamFacade {
     public TeamResponseDto update(Long id, TeamRequestDto dto) {
         TeamEntity teamEntity = teamService.findById(id);
         teamMapper.updateFromDto(dto, teamEntity);
-        return teamMapper.toDto(teamService.save(teamEntity));
+        return teamMapper.toDto(teamService.save(teamEntity, null));
     }
 
     @Caching(
