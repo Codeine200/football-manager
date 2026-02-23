@@ -73,7 +73,9 @@ public class MatchUpdateTests {
 
         assertEquals(2026, updated.getSeason());
         assertEquals(false, updated.getStats().getFirst().getIsWinner());
+        assertEquals(2, updated.getStats().getFirst().getGoals());
         assertEquals(true, updated.getStats().getLast().getIsWinner());
+        assertEquals(5, updated.getStats().getLast().getGoals());
     }
 
     @Test

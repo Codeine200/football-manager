@@ -139,17 +139,23 @@ public class MatchService {
             clearMatchesStats(matchEntity);
             return matchRepository.save(matchEntity);
         }
-        matchEntity.getStats().clear();
-        TeamFullInfo team1 = newMatchFullInfo.getTeam1();
-        matchEntity.getStats().add(
-                MatchStatsEntity.builder().team(teamService.findById(team1.getTeamId().id()))
-                        .goals(team1.getGoals()).build());
-
-        matchEntity.getStats().add(
-                new MatchStatsEntity(matchEntity, team2, dto.getTeam2().getGoals(), ...)
-    );
+        updateStats(matchEntity, newMatchFullInfo);
         recalculateStats(matchEntity);
-        return matchEntity;
+        return matchRepository.save(matchEntity);
+    }
+
+    private void updateStats(MatchEntity matchEntity, MatchFullInfo newMatchFullInfo) {
+        MatchStatsEntity stats1 = matchEntity.getStats().getFirst();
+        TeamFullInfo newTeam1 = newMatchFullInfo.getTeam1();
+        stats1.setTeam(teamService.findById(newTeam1.getTeamId().id()));
+        stats1.setGuest(newTeam1.isGuest());
+        stats1.setGoals(newTeam1.getGoals());
+
+        MatchStatsEntity stats2 = matchEntity.getStats().getLast();
+        TeamFullInfo newTeam2 = newMatchFullInfo.getTeam2();
+        stats2.setTeam(teamService.findById(newTeam2.getTeamId().id()));
+        stats2.setGuest(newTeam2.isGuest());
+        stats2.setGoals(newTeam2.getGoals());
     }
 
     private void recalculateStats(MatchEntity matchEntity) {
