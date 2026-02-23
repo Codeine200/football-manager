@@ -19,5 +19,14 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
+ENV UPLOADS_FOLDER=/football-manager/uploads
+
+RUN addgroup spring \
+    && adduser -G spring -s /bin/sh -D spring \
+    && mkdir -p $UPLOADS_FOLDER \
+    && chown spring:spring $UPLOADS_FOLDER \
+    && chmod 750 /app/uploads
+USER spring
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

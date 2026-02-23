@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/teams")
@@ -37,7 +39,8 @@ public class TeamController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TeamResponseDto create(@RequestBody @Valid TeamRequestDto dto) {
+    public TeamResponseDto create(@RequestBody @Valid TeamRequestDto dto,
+                                  @RequestPart(value = "file", required = false) MultipartFile file ) {
         return teamFacade.save(dto);
     }
 

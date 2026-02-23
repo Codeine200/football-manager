@@ -27,3 +27,6 @@ spring:
         type: caffeine
         caffeine:
             spec: maximumSize=500,expireAfterWrite=10m
+
+uploads:
+    folder: ${UPLOADS_FOLDER:/football-manager/uploads}
