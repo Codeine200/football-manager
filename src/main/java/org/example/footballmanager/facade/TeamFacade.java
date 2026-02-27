@@ -1,6 +1,7 @@
 package org.example.footballmanager.facade;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.footballmanager.dto.request.TeamRequestDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.TeamResponseDto;
@@ -8,6 +9,7 @@ import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.mapper.PageMapper;
 import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.service.TeamService;
+import org.example.footballmanager.store.TeamFileStorageService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TeamFacade {
@@ -24,6 +29,7 @@ public class TeamFacade {
     private final TeamService teamService;
     private final TeamMapper teamMapper;
     private final PageMapper pageMapper;
+    private final TeamFileStorageService fileStorageService;
 
     @Cacheable(value = "teams", key = "#id")
     public TeamResponseDto findById(Long id) {
@@ -75,6 +81,16 @@ public class TeamFacade {
             }
     )
     public void deleteById(Long id) {
-        teamService.deleteById(id);
+        TeamEntity teamEntity = teamService.deleteById(id);
+        if (teamEntity.getLogo() != null && !teamEntity.getLogo().isBlank()) {
+            try {
+                fileStorageService.delete(teamEntity.getLogo());
+            } catch (IOException e) {
+                log.error("Failed to delete logo file '{}' for team with id {}",
+                        teamEntity.getLogo(),
+                        teamEntity.getId(),
+                        e);
+            }
+        }
     }
 }

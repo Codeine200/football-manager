@@ -1,5 +1,6 @@
 package org.example.footballmanager.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.footballmanager.entity.TeamEntity;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -52,23 +52,15 @@ public class TeamService {
                 .findAll(pageable);
     }
 
-    public void deleteById(Long id) {
+    @Transactional
+    public TeamEntity deleteById(Long id) {
         TeamEntity teamEntity = teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
-        if (teamEntity.getLogo() != null && !teamEntity.getLogo().isBlank()) {
-            try {
-                fileStorageService.delete(teamEntity.getLogo());
-            } catch (IOException e) {
-                log.error("Failed to delete logo file '{}' for team with id {}",
-                        teamEntity.getLogo(),
-                        teamEntity.getId(),
-                        e);
-            }
-        }
         playerRepository.detachPlayersFromTeam(id);
         List<Long> matchesIds = matchStatsRepository.findMatchIdsByTeamId(id);
         matchStatsRepository.deleteStatsByMatchIds(matchesIds);
         matchRepository.deleteMatchesByIds(matchesIds);
         teamRepository.delete(teamEntity);
+        return teamEntity;
     }
 }
