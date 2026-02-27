@@ -1,0 +1,2 @@
+ALTER TABLE football.player
+    ADD COLUMN IF NOT EXISTS photo VARCHAR(255);

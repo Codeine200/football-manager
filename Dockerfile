@@ -19,13 +19,13 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-ENV UPLOADS_FOLDER=/home/codeine/football-manager/uploads
+ENV UPLOADS_TEAMS_PHOTOS_FOLDER=/football-manager/uploads/teams
+ENV UPLOADS_PLAYERS_PHOTOS_FOLDER=/football-manager/uploads/players
 
 RUN addgroup spring \
     && adduser -G spring -s /bin/sh -D spring \
-    && mkdir -p $UPLOADS_FOLDER \
-    && chown spring:spring $UPLOADS_FOLDER \
-    && chmod 750 /app/uploads
+    && install -d -m 750 -o spring -g spring "$UPLOADS_TEAMS_PHOTOS_FOLDER" \
+    && install -d -m 750 -o spring -g spring "$UPLOADS_PLAYERS_PHOTOS_FOLDER"
 USER spring
 
 EXPOSE 8080

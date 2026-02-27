@@ -1,6 +1,5 @@
 package org.example.footballmanager.facade;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.domain.Match;
 import org.example.footballmanager.domain.MatchFinish;
@@ -21,6 +20,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor

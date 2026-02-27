@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,8 +50,9 @@ public class TeamController {
 
     @PutMapping("/{id}")
     public TeamResponseDto update(@PathVariable Long id,
-                                  @RequestBody @Valid TeamRequestDto dto) {
-        return teamFacade.update(id, dto);
+                                  @RequestPart("team") @Valid TeamRequestDto dto,
+                                  @RequestPart(value = "file", required = false) MultipartFile file) {
+        return teamFacade.update(id, dto, file);
     }
 
     @DeleteMapping("/{id}")

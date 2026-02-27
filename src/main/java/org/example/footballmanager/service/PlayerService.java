@@ -8,9 +8,12 @@ import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.PlayerNotFoundException;
 import org.example.footballmanager.mapper.PlayerMapper;
 import org.example.footballmanager.repository.PlayerRepository;
+import org.example.footballmanager.store.PlayerFileStorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -19,19 +22,27 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final PlayerMapper playerMapper;
     private final TeamService teamService;
+    private final PlayerFileStorageService fileStorageService;
 
-    public PlayerEntity save(PlayerEntity playerEntity) {
-        return playerRepository.save(playerEntity);
+    public PlayerEntity save(PlayerEntity playerEntity, MultipartFile file) {
+        PlayerEntity savedPlayerEntity = playerRepository.save(playerEntity);
+        if (file != null && !file.isEmpty()) {
+            String savedFileName = fileStorageService.saveFile(file, savedPlayerEntity.getId().toString());
+            savedPlayerEntity.setPhoto(savedFileName);
+            playerRepository.save(savedPlayerEntity);
+        }
+        return savedPlayerEntity;
     }
 
-    public PlayerEntity create(Player player) {
+    @Transactional
+    public PlayerEntity create(Player player, MultipartFile file) {
         PlayerEntity playerEntity = playerMapper.toEntity(player);
 
         if (player.getTeamId() != null) {
             playerEntity.setTeam(teamService.findById(player.getTeamId().id()));
         }
 
-        return save(playerEntity);
+        return save(playerEntity, file);
     }
 
     public PlayerEntity findById(Long id) {
@@ -55,6 +66,7 @@ public class PlayerService {
         playerRepository.delete(playerEntity);
     }
 
+    @Transactional
     public PlayerEntity assign(Long playerId, TeamId teamId) {
         PlayerEntity playerEntity = findById(playerId);
 
@@ -64,6 +76,6 @@ public class PlayerService {
         }
 
         playerEntity.setTeam(teamEntity);
-        return save(playerEntity);
+        return save(playerEntity, null);
     }
 }

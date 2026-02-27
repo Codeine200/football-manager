@@ -1,10 +1,8 @@
 package org.example.footballmanager.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.footballmanager.config.UploadProperties;
-import org.example.footballmanager.exception.FileNotFoundException;
+import org.example.footballmanager.facade.FileStorageFacade;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,23 +19,20 @@ import java.nio.file.Paths;
 @RequestMapping("/files")
 @RequiredArgsConstructor
 public class FileController {
-    private final UploadProperties cfg;
+    private final FileStorageFacade fileStorageFacade;
 
-    @GetMapping("/{filename}")
-    public ResponseEntity<Resource> getFile(@PathVariable String filename) throws IOException {
-        Path uploadFolder = Paths.get(cfg.getFolder());
-        Path file = Paths.get(cfg.getFolder()).resolve(filename).normalize();
-        if (!file.startsWith(uploadFolder)) {
-            throw new FileNotFoundException("File not found");
+    @GetMapping("/{type}/{filename:.+}")
+    public ResponseEntity<Resource> getFile(
+            @PathVariable String type,
+            @PathVariable String filename) throws IOException {
+
+        Resource resource = fileStorageFacade.loadFile(type, filename);
+
+        Path filePath = Paths.get(resource.getURI());
+        String contentType = Files.probeContentType(filePath);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
         }
-
-        Resource resource = new UrlResource(file.toUri());
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new FileNotFoundException("File not found");
-        }
-
-        String contentType = Files.probeContentType(file);
-        if (contentType == null) contentType = "application/octet-stream";
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, contentType)

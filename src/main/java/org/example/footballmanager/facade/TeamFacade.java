@@ -58,10 +58,10 @@ public class TeamFacade {
                     @CacheEvict(value = "players-page", allEntries = true)
             }
     )
-    public TeamResponseDto update(Long id, TeamRequestDto dto) {
+    public TeamResponseDto update(Long id, TeamRequestDto dto, MultipartFile file) {
         TeamEntity teamEntity = teamService.findById(id);
         teamMapper.updateFromDto(dto, teamEntity);
-        return teamMapper.toDto(teamService.save(teamEntity, null));
+        return teamMapper.toDto(teamService.save(teamEntity, file));
     }
 
     @Caching(

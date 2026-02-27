@@ -10,5 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "uploads")
 public class UploadProperties {
-    private String folder;
+    private String teamsPhotosFolder;
+    private String playersPhotosFolder;
 }

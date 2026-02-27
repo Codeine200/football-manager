@@ -1,6 +1,5 @@
 package org.example.footballmanager.facade;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.domain.Player;
 import org.example.footballmanager.domain.TeamId;
@@ -20,6 +19,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
@@ -30,14 +31,14 @@ public class PlayerFacade {
     private final PlayerMapper playerMapper;
     private final PageMapper pageMapper;
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Cacheable(value = "players", key = "#id")
     public PlayerResponseDto findById(Long id) {
         PlayerEntity playerEntity = playerService.findById(id);
         return playerMapper.toDto(playerEntity);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Cacheable(
             value = "players-page",
             key = "'team=' + #teamId + " +
@@ -63,26 +64,26 @@ public class PlayerFacade {
 
     @Transactional
     @CacheEvict(value = "players-page", allEntries = true)
-    public PlayerResponseDto create(PlayerRequestDto dto) {
+    public PlayerResponseDto create(PlayerRequestDto dto, MultipartFile file) {
         Player player = playerMapper.toDomain(dto);
-        PlayerEntity saved = playerService.create(player);
+        PlayerEntity saved = playerService.create(player, file);
         return playerMapper.toDto(saved);
     }
 
     @Transactional
     @CachePut(value = "players", key = "#playerId")
     @CacheEvict(value = "players-page", allEntries = true)
-    public PlayerResponseDto update(Long playerId, PlayerRequestDto dto) {
+    public PlayerResponseDto update(Long playerId, PlayerRequestDto dto, MultipartFile file) {
         PlayerEntity playerEntity = playerService.findById(playerId);
 
         TeamEntity teamEntity = null;
         if (dto.teamId() != null) {
-            teamEntity = teamService.findById(dto.teamId());
+            teamEntity = teamService.getReferenceById(dto.teamId());
         }
 
         playerMapper.updateFromDto(dto, playerEntity);
         playerEntity.setTeam(teamEntity);
-        PlayerEntity saved = playerService.save(playerEntity);
+        PlayerEntity saved = playerService.save(playerEntity, file);
         return playerMapper.toDto(saved);
     }
 

@@ -43,6 +43,9 @@ public class PlayerEntity {
     @Column(name = "middle_name")
     private String middleName;
 
+    @Column(name = "photo")
+    private String photo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_team")
     private TeamEntity team;

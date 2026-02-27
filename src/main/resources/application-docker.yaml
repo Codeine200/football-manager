@@ -29,4 +29,5 @@ spring:
             spec: maximumSize=500,expireAfterWrite=10m
 
 uploads:
-    folder: ${UPLOADS_FOLDER:/home/codeine/football-manager/uploads}
+    teams-photos-folder: ${UPLOADS_TEAMS_PHOTOS_FOLDER:/football-manager/uploads/teams}
+    players-photos-folder-: ${UPLOADS_PLAYERS_PHOTOS_FOLDER:/football-manager/uploads/players}

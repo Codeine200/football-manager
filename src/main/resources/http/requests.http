@@ -34,15 +34,25 @@ GET http://localhost:8080/api/v1/teams
 GET http://localhost:8080/api/v1/teams?page=0&size=10
 
 ### Get a team by ID
-GET http://localhost:8080/api/v1/teams/1
+GET http://localhost:8080/api/v1/teams/13
 
 ### Update a team
-PUT http://localhost:8080/api/v1/teams/1
+PUT http://localhost:8080/api/v1/teams/13
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="team"
 Content-Type: application/json
 
 {
-  "name": "Blue Tigers"
+  "name": "Juventude"
 }
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="logo.svg"
+Content-Type: image/svg+xml
+
+< ./img/logo.svg
+--WebAppBoundary--
 
 ### Delete a team
 DELETE http://localhost:8080/api/v1/teams/1
@@ -53,17 +63,31 @@ DELETE http://localhost:8080/api/v1/teams/1
 
 ### Create a player
 POST http://localhost:8080/api/v1/players
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="player"
 Content-Type: application/json
 
 {
-  "firstName": "Lionel",
-  "lastName": "Messi",
-  "middleName": "Andres",
-  "teamId": 1
+  "firstName": "Jandrei",
+  "lastName": "Chitolina",
+  "middleName": "Carniel",
+  "teamId": 13
 }
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="messi.png"
+Content-Type: image/png
+
+< ./img/player.webp
+--WebAppBoundary--
 
 ### Create a player with a bad request
 POST http://localhost:8080/api/v1/players
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="player"
 Content-Type: application/json
 
 {
@@ -72,6 +96,7 @@ Content-Type: application/json
   "middleName": "",
   "teamId": 1
 }
+--WebAppBoundary--
 
 ### Get all players (with pagination)
 GET http://localhost:8080/api/v1/players?page=0&size=10
@@ -80,15 +105,25 @@ GET http://localhost:8080/api/v1/players?page=0&size=10
 GET http://localhost:8080/api/v1/players/1
 
 ### Update a player
-PUT http://localhost:8080/api/v1/players/1
+PUT http://localhost:8080/api/v1/players/61
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="player"
 Content-Type: application/json
 
 {
-  "firstName": "Cristiano",
-  "lastName": "Ronaldo",
-  "middleName": null,
-  "teamId": 2
+  "firstName": "Pedro",
+  "lastName": "Henrique",
+  "middleName": "Rocha da Silva",
+  "teamId": 13
 }
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="messi.png"
+Content-Type: image/png
+
+< ./img/new-player.webp
+--WebAppBoundary--
 
 ### Delete a player
 DELETE http://localhost:8080/api/v1/players/1
@@ -148,8 +183,11 @@ Content-Type: application/json
   "isFinished": true
 }
 
-### get file
-GET http://localhost:8080/files/juventude-footballlogos-org.svg
+### Get team logo
+GET http://localhost:8080/files/teams/13.svg
+
+### Get player photo
+GET http://localhost:8080/files/players/62.png
 
 
 

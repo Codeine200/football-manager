@@ -1,6 +1,5 @@
 package org.example.footballmanager.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.TeamNotFoundException;
@@ -8,6 +7,7 @@ import org.example.footballmanager.repository.MatchRepository;
 import org.example.footballmanager.repository.MatchStatsRepository;
 import org.example.footballmanager.repository.PlayerRepository;
 import org.example.footballmanager.repository.TeamRepository;
+import org.example.footballmanager.store.TeamFileStorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class TeamService {
     private final PlayerRepository playerRepository;
     private final MatchRepository matchRepository;
     private final MatchStatsRepository matchStatsRepository;
-    private final FileStorageService fileStorageService;
+    private final TeamFileStorageService fileStorageService;
 
     public TeamEntity save(TeamEntity teamEntity, MultipartFile file) {
         TeamEntity savedTeamEntity = teamRepository.save(teamEntity);
@@ -40,12 +40,15 @@ public class TeamService {
                 .orElseThrow(() -> new TeamNotFoundException(id));
     }
 
+    public TeamEntity getReferenceById(Long id) {
+        return teamRepository.getReferenceById(id);
+    }
+
     public Page<TeamEntity> findAll(Pageable pageable) {
         return teamRepository
                 .findAll(pageable);
     }
 
-    @Transactional
     public void deleteById(Long id) {
         TeamEntity teamEntity = teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
