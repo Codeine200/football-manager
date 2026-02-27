@@ -71,6 +71,29 @@ public abstract class FileStorageService {
 
     public Resource loadAsResource(String filename) throws IOException {
 
+        Path file = resolveAndValidate(filename);
+        Resource resource = new UrlResource(file.toUri());
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new FileNotFoundException("File not found");
+        }
+
+        return resource;
+    }
+    public void delete(String filename) throws IOException {
+
+        Path file = resolveAndValidate(filename);
+        if (!file.startsWith(getFolder())) {
+            throw new SecurityException("Invalid file path");
+        }
+
+        if (!Files.exists(file)) {
+            throw new FileNotFoundException("File not found");
+        }
+
+        Files.delete(file);
+    }
+
+    private Path resolveAndValidate(String filename) {
         if (filename == null || filename.isBlank()) {
             throw new IllegalArgumentException("Filename is empty");
         }
@@ -82,12 +105,6 @@ public abstract class FileStorageService {
             throw new SecurityException("Invalid file path");
         }
 
-        Resource resource = new UrlResource(file.toUri());
-
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new FileNotFoundException("File not found");
-        }
-
-        return resource;
+        return file;
     }
 }

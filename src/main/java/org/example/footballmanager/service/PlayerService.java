@@ -1,6 +1,7 @@
 package org.example.footballmanager.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.footballmanager.domain.Player;
 import org.example.footballmanager.domain.TeamId;
 import org.example.footballmanager.entity.PlayerEntity;
@@ -15,8 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
@@ -63,6 +67,16 @@ public class PlayerService {
     public void deleteById(Long id) {
         PlayerEntity playerEntity = playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
+        if (playerEntity.getPhoto() != null && !playerEntity.getPhoto().isBlank()) {
+            try {
+                fileStorageService.delete(playerEntity.getPhoto());
+            } catch (IOException e) {
+                log.error("Failed to delete photo file '{}' for player with id {}",
+                        playerEntity.getPhoto(),
+                        playerEntity.getId(),
+                        e);
+            }
+        }
         playerRepository.delete(playerEntity);
     }
 
