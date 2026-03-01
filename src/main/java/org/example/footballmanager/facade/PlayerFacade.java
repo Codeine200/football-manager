@@ -1,6 +1,7 @@
 package org.example.footballmanager.facade;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.footballmanager.domain.Player;
 import org.example.footballmanager.domain.TeamId;
 import org.example.footballmanager.dto.request.PlayerAssignRequestDto;
@@ -13,15 +14,20 @@ import org.example.footballmanager.mapper.PageMapper;
 import org.example.footballmanager.mapper.PlayerMapper;
 import org.example.footballmanager.service.PlayerService;
 import org.example.footballmanager.service.TeamService;
+import org.example.footballmanager.store.PlayerFileStorageService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PlayerFacade {
@@ -30,6 +36,7 @@ public class PlayerFacade {
     private final TeamService teamService;
     private final PlayerMapper playerMapper;
     private final PageMapper pageMapper;
+    private final PlayerFileStorageService fileStorageService;
 
     @Transactional(readOnly = true)
     @Cacheable(value = "players", key = "#id")
@@ -95,9 +102,23 @@ public class PlayerFacade {
         return playerMapper.toDto(saved);
     }
 
-    @CachePut(value = "players", key = "#id")
-    @CacheEvict(value = "players-page", allEntries = true)
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "players-page", allEntries = true),
+                    @CacheEvict(value = "players", key = "#id"),
+            }
+    )
     public void deleteById(Long id) {
-        playerService.deleteById(id);
+        PlayerEntity playerEntity = playerService.deleteById(id);
+        if (playerEntity.getPhoto() != null && !playerEntity.getPhoto().isBlank()) {
+            try {
+                fileStorageService.delete(playerEntity.getPhoto());
+            } catch (IOException e) {
+                log.error("Failed to delete photo file '{}' for player with id {}",
+                        playerEntity.getPhoto(),
+                        playerEntity.getId(),
+                        e);
+            }
+        }
     }
 }

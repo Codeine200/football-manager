@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -64,20 +62,12 @@ public class PlayerService {
                 .findAllByTeam_Id(teamId, pageable);
     }
 
-    public void deleteById(Long id) {
+    @Transactional
+    public PlayerEntity deleteById(Long id) {
         PlayerEntity playerEntity = playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
-        if (playerEntity.getPhoto() != null && !playerEntity.getPhoto().isBlank()) {
-            try {
-                fileStorageService.delete(playerEntity.getPhoto());
-            } catch (IOException e) {
-                log.error("Failed to delete photo file '{}' for player with id {}",
-                        playerEntity.getPhoto(),
-                        playerEntity.getId(),
-                        e);
-            }
-        }
         playerRepository.delete(playerEntity);
+        return playerEntity;
     }
 
     @Transactional
