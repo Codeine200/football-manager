@@ -29,9 +29,12 @@ services:
             SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
             SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
             SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-
+            UPLOADS_TEAMS_PHOTOS_FOLDER: /football-manager/uploads/teams
+            UPLOADS_PLAYERS_PHOTOS_FOLDER: /football-manager/uploads/players
         ports:
             - "${APP_PORT}:8080"
+        volumes:
+            - ${UPLOADS_ROOT}:/football-manager/uploads
 
 volumes:
     postgres_data:
