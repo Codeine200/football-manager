@@ -191,3 +191,25 @@ GET http://localhost:8080/files/players/62.png
 
 
 
+
+
+### Path traversal attack
+GET http://localhost:8080/files/players/../../../../etc/passwd
+
+### XSS atack
+POST http://localhost:8080/api/v1/teams
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="team"
+Content-Type: application/json
+
+{
+  "name": "XSS Test"
+}
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="xss.svg"
+Content-Type: image/svg+xml
+
+< ./img/xss.svg
+--WebAppBoundary--

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PlayerFileStorageService extends FileStorageService {
+public class PlayerFileStorageService extends ImageStorageService {
 
     private final UploadProperties properties;
 

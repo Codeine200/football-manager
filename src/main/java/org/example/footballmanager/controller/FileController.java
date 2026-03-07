@@ -35,6 +35,7 @@ public class FileController {
         }
 
         return ResponseEntity.ok()
+                .header("X-Content-Type-Options", "nosniff")
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
                 .body(resource);
     }

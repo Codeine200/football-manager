@@ -5,10 +5,9 @@ import org.example.footballmanager.config.UploadProperties;
 import org.example.footballmanager.type.FileType;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
-public class TeamFileStorageService extends FileStorageService {
+public class TeamFileStorageService extends ImageStorageService {
 
     private final UploadProperties properties;
 

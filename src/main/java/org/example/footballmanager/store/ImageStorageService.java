@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +17,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
-public abstract class FileStorageService {
+public abstract class ImageStorageService {
 
     public abstract String getFolder();
     public abstract FileType getFileType();
@@ -42,6 +44,10 @@ public abstract class FileStorageService {
     public String saveFile(MultipartFile file, String newName) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
+        }
+
+        if (!isImage(file)) {
+            throw new RuntimeException("Failed to store file");
         }
 
         try {
@@ -106,5 +112,15 @@ public abstract class FileStorageService {
         }
 
         return file;
+    }
+
+    private boolean isImage(MultipartFile file) {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(file.getInputStream());
+        } catch (IOException e) {
+            return false;
+        }
+        return image != null;
     }
 }

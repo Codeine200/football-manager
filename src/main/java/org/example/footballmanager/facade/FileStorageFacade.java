@@ -2,7 +2,7 @@ package org.example.footballmanager.facade;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.example.footballmanager.store.FileStorageService;
+import org.example.footballmanager.store.ImageStorageService;
 import org.example.footballmanager.type.FileType;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -16,14 +16,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileStorageFacade {
 
-    private final List<FileStorageService> fileStorageServiceList;
+    private final List<ImageStorageService> fileStorageServiceList;
 
-    private Map<FileType, FileStorageService> storageServiceMap;
+    private Map<FileType, ImageStorageService> storageServiceMap;
 
     @PostConstruct
     public void init() {
         storageServiceMap = new HashMap<>();
-        for (FileStorageService service : fileStorageServiceList) {
+        for (ImageStorageService service : fileStorageServiceList) {
             String folder = service.getFolder();
             FileType fileType = service.getFileType();
             if (folder != null && !folder.isBlank() && fileType != null) {
@@ -41,7 +41,7 @@ public class FileStorageFacade {
             throw new IllegalArgumentException("Folder is empty");
         }
 
-        FileStorageService service = storageServiceMap.get(FileType.fromString(folder));
+        ImageStorageService service = storageServiceMap.get(FileType.fromString(folder));
 
         if (service == null) {
             throw new IllegalArgumentException("No FileStorageService found for folder: " + folder);
