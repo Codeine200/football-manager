@@ -213,3 +213,13 @@ Content-Type: image/svg+xml
 
 < ./img/xss.svg
 --WebAppBoundary--
+
+
+### Auth
+POST http://localhost:8081/auth/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "password"
+}

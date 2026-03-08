@@ -1,3 +1,6 @@
+server:
+    port: 8081
+
 spring:
     application:
         name: FootballManager
@@ -5,7 +8,6 @@ spring:
         multipart:
             max-file-size: 5MB
             max-request-size: 5MB
-
     datasource:
         url: jdbc:postgresql://localhost:5432/football_manager
         username: football_admin
@@ -29,6 +31,10 @@ spring:
         type: caffeine
         caffeine:
             spec: maximumSize=500,expireAfterWrite=10m
+
+jwt:
+    secret: verySecretKeyverySecretKeyverySecretKeyverySecretKey
+    expiration: 86400000
 
 uploads:
     teams-photos-folder: ${UPLOADS_TEAMS_PHOTOS_FOLDER:/home/codeine/football-manager/uploads/teams}
