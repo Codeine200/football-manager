@@ -1,21 +1,31 @@
 package org.example.footballmanager.security;
 
-import org.springframework.security.core.userdetails.User;
+import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.entity.UserEntity;
+import org.example.footballmanager.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service
-public class DatabaseUserDetailsService implements UserDetailsService {
-    @Override
-    public UserDetails loadUserByUsername(String username)
-            throws UsernameNotFoundException {
+import java.util.List;
 
-        return User.builder()
-                .username(username)
-                .password("$2a$10$LX1s28LrZU32UzJ0LkLMt.zM1m3LyKbsfI85Zx.mRQXQ0C0YbtTVC")
-                .roles("USER")
-                .build();
+@Service
+@RequiredArgsConstructor
+public class DatabaseUserDetailsService implements UserDetailsService {
+    private final UserRepository repository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+
+        UserEntity user = repository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+        );
     }
 }

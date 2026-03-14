@@ -220,6 +220,6 @@ POST http://localhost:8081/auth/login
 Content-Type: application/json
 
 {
-  "username": "user",
+  "username": "admin",
   "password": "password"
 }
