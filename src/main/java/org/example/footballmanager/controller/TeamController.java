@@ -9,6 +9,7 @@ import org.example.footballmanager.facade.TeamFacade;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +42,7 @@ public class TeamController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public TeamResponseDto create(
             @RequestPart("team") @Valid TeamRequestDto dto,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -49,6 +51,7 @@ public class TeamController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public TeamResponseDto update(@PathVariable Long id,
                                   @RequestPart("team") @Valid TeamRequestDto dto,
                                   @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -57,6 +60,7 @@ public class TeamController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         teamFacade.deleteById(id);
     }
