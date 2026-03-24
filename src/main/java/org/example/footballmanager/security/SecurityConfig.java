@@ -39,6 +39,7 @@ public class SecurityConfig {
                         auth
                             .requestMatchers("/auth/**").permitAll()
                             .requestMatchers("/api/v1/players/**").permitAll()
+                            .requestMatchers("/api/v1/teams/**").permitAll()
                             .requestMatchers("/files/**").permitAll()
                             .anyRequest().authenticated()
                 )

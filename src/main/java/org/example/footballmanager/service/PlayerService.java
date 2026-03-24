@@ -53,18 +53,15 @@ public class PlayerService {
     }
 
     public Page<PlayerEntity> findAll(Pageable pageable) {
-        return playerRepository
-                .findAll(pageable);
+        return playerRepository.findAll(pageable);
     }
 
     public Page<PlayerEntity> searchPlayers(Long teamId, String search, Pageable pageable) {
-        return playerRepository
-                .searchPlayers(teamId, search, pageable);
+        return playerRepository.searchPlayers(teamId, search, pageable);
     }
 
     public Page<PlayerEntity> findAllByTeamId(Long teamId, Pageable pageable) {
-        return playerRepository
-                .findAllByTeam_Id(teamId, pageable);
+        return playerRepository.findAllByTeam_Id(teamId, pageable);
     }
 
     @Transactional

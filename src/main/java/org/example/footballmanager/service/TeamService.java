@@ -43,13 +43,16 @@ public class TeamService {
                 .orElseThrow(() -> new TeamNotFoundException(id));
     }
 
+    public Page<TeamEntity> searchTeams(String search, Pageable pageable) {
+        return teamRepository.searchTeams(search, pageable);
+    }
+
     public TeamEntity getReferenceById(Long id) {
         return teamRepository.getReferenceById(id);
     }
 
     public Page<TeamEntity> findAll(Pageable pageable) {
-        return teamRepository
-                .findAll(pageable);
+        return teamRepository.findAll(pageable);
     }
 
     @Transactional

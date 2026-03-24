@@ -39,10 +39,18 @@ public class TeamFacade {
     @Cacheable(
             value = "teams-page",
             key = "'p=' + #pageable.pageNumber + " +
+                    "'&search=' + (#search != null ? #search : '') + " +
                     "'&s=' + #pageable.pageSize + " +
                     "'&sort=' + #pageable.sort"
     )
-    public PageResponse<TeamResponseDto> findAll(Pageable pageable) {
+    public PageResponse<TeamResponseDto> findAll(String search, Pageable pageable) {
+        if (search != null && !search.isEmpty()) {
+            String searchTerm = search.trim().toLowerCase();
+            Page<TeamResponseDto> page = teamService
+                    .searchTeams(searchTerm, pageable)
+                    .map(teamMapper::toDto);
+            return pageMapper.toDto(page);
+        }
         Page<TeamResponseDto> page = teamService
                 .findAll(pageable)
                 .map(teamMapper::toDto);

@@ -7,6 +7,7 @@ import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.TeamResponseDto;
 import org.example.footballmanager.facade.TeamFacade;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,8 +31,10 @@ public class TeamController {
     private final TeamFacade teamFacade;
 
     @GetMapping
-    public PageResponse<TeamResponseDto> getAll(Pageable pageable) {
-        return teamFacade.findAll(pageable);
+    public PageResponse<TeamResponseDto> getAll(
+            @RequestParam(required = false) String search,
+             @PageableDefault(sort = {"name"}) Pageable pageable) {
+        return teamFacade.findAll(search, pageable);
     }
 
     @GetMapping("/{id}")
