@@ -1,5 +1,5 @@
 server:
-    port: 8081
+    port: 8080
 
 spring:
     application:
@@ -19,6 +19,12 @@ spring:
         properties:
             hibernate:
                 default_schema: football
+                format_sql: true
+                jdbc:
+                    lob:
+                        non_contextual_creation: true
+                type:
+                    descriptor: trace
         hibernate:
             ddl-auto: validate
         show-sql: true
@@ -38,4 +44,9 @@ jwt:
 
 uploads:
     teams-photos-folder: ${UPLOADS_TEAMS_PHOTOS_FOLDER:/home/codeine/football-manager/uploads/teams}
-    players-photos-folder-: ${UPLOADS_PLAYERS_PHOTOS_FOLDER:/home/codeine/football-manager/uploads/players}
+    players-photos-folder: ${UPLOADS_PLAYERS_PHOTOS_FOLDER:/home/codeine/football-manager/uploads/players}
+
+cors:
+    allowed-origins:
+        - http://localhost:5173
+        - http://localhost:3000

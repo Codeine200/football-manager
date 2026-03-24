@@ -34,14 +34,8 @@ public class PlayerEntity {
     )
     private Long id;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-
-    @Column(name = "middle_name")
-    private String middleName;
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
 
     @Column(name = "photo")
     private String photo;

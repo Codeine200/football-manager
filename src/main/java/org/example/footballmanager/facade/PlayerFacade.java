@@ -49,11 +49,20 @@ public class PlayerFacade {
     @Cacheable(
             value = "players-page",
             key = "'team=' + #teamId + " +
+                    "'&search=' + (#search != null ? #search : '') + " +
                     "'&p=' + #pageable.pageNumber + " +
                     "'&s=' + #pageable.pageSize + " +
                     "'&sort=' + #pageable.sort"
     )
-    public PageResponse<PlayerResponseDto> findAllByTeamId(Long teamId, Pageable pageable) {
+    public PageResponse<PlayerResponseDto> findAllByTeamId(Long teamId, String search, Pageable pageable) {
+        if (search != null && !search.isEmpty()) {
+            String searchTerm = search.trim().toLowerCase();
+            Page<PlayerResponseDto> page = playerService
+                    .searchPlayers(teamId, searchTerm, pageable)
+                    .map(playerMapper::toDto);
+            return pageMapper.toDto(page);
+        }
+
         if (teamId == null) {
             Page<PlayerResponseDto> page = playerService
                     .findAll(pageable)

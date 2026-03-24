@@ -11,7 +11,21 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<PlayerEntity, Long> {
+    Page<PlayerEntity> findAll(Pageable pageable);
     Page<PlayerEntity> findAllByTeam_Id(Long teamId, Pageable pageable);
+
+    @Query("""
+        SELECT p
+        FROM PlayerEntity p
+        WHERE (:teamId IS NULL OR p.team.id = :teamId)
+          AND LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%'))
+        ORDER BY p.fullName
+    """)
+    Page<PlayerEntity> searchPlayers(
+            @Param("teamId") Long teamId,
+            @Param("search") String search,
+            Pageable pageable
+    );
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""

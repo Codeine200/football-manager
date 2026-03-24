@@ -71,9 +71,7 @@ Content-Disposition: form-data; name="player"
 Content-Type: application/json
 
 {
-  "firstName": "Jandrei",
-  "lastName": "Chitolina",
-  "middleName": "Carniel",
+  "fullName": "Jandrei Chitolina Carniel",
   "teamId": 13
 }
 --WebAppBoundary
@@ -92,12 +90,13 @@ Content-Disposition: form-data; name="player"
 Content-Type: application/json
 
 {
-  "firstName": "",
-  "lastName": "",
-  "middleName": "",
+  "fullName": "",
   "teamId": 1
 }
 --WebAppBoundary--
+
+### Get all players (without pagination)
+GET http://localhost:8080/api/v1/players
 
 ### Get all players (with pagination)
 GET http://localhost:8080/api/v1/players?page=0&size=10
@@ -114,9 +113,7 @@ Content-Disposition: form-data; name="player"
 Content-Type: application/json
 
 {
-  "firstName": "Pedro",
-  "lastName": "Henrique",
-  "middleName": "Rocha da Silva",
+  "fullName": "Pedro Henrique Rocha da Silva",
   "teamId": 13
 }
 --WebAppBoundary
@@ -128,6 +125,13 @@ Content-Type: image/png
 
 ### Delete a player
 DELETE http://localhost:8080/api/v1/players/1
+
+### Search players
+GET http://localhost:8080/api/v1/players?search=font
+
+# =============================
+# MATCH REQUESTS
+# =============================
 
 ### Craete a match
 POST http://localhost:8080/api/v1/matches
@@ -190,10 +194,6 @@ GET http://localhost:8080/files/teams/13.svg
 ### Get player photo
 GET http://localhost:8080/files/players/62.png
 
-
-
-
-
 ### Path traversal attack
 GET http://localhost:8080/files/players/../../../../etc/passwd
 
@@ -214,7 +214,6 @@ Content-Type: image/svg+xml
 
 < ./img/xss.svg
 --WebAppBoundary--
-
 
 ### Auth
 POST http://localhost:8081/auth/login

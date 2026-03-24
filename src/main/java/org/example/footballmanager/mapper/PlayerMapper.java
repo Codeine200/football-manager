@@ -8,10 +8,12 @@ import org.example.footballmanager.entity.PlayerEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring", uses = TeamMapper.class)
 public interface PlayerMapper {
 
+    @Mapping(target = "photo", source = "photo", qualifiedByName = "addPhotoPath")
     PlayerResponseDto toDto(PlayerEntity playerEntity);
 
     @Mapping(target = "teamId", expression = "java(new TeamId(dto.teamId()))")
@@ -27,5 +29,11 @@ public interface PlayerMapper {
 
     default Long mapTeamId(TeamId teamId) {
         return teamId != null ? teamId.id() : null;
+    }
+
+    @Named("addPhotoPath")
+    default String addPhotoPath(String photoFileName) {
+        if (photoFileName == null || photoFileName.isBlank()) return null;
+        return "/files/players/" + photoFileName;
     }
 }

@@ -36,8 +36,11 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/auth/**").permitAll()
-                                .anyRequest().authenticated()
+                        auth
+                            .requestMatchers("/auth/**").permitAll()
+                            .requestMatchers("/api/v1/players/**").permitAll()
+                            .requestMatchers("/files/**").permitAll()
+                            .anyRequest().authenticated()
                 )
                 .userDetailsService(databaseUserDetailsService)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

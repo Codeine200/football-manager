@@ -8,6 +8,7 @@ import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.dto.response.PlayerResponseDto;
 import org.example.footballmanager.facade.PlayerFacade;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,8 +35,9 @@ public class PlayerController {
     @GetMapping
     public PageResponse<PlayerResponseDto> getAllByTeamId(
             @RequestParam(required = false) Long teamId,
-            Pageable pageable) {
-        return playerFacade.findAllByTeamId(teamId, pageable);
+            @RequestParam(required = false) String search,
+            @PageableDefault(sort = {"fullName"}) Pageable pageable) {
+        return playerFacade.findAllByTeamId(teamId, search, pageable);
     }
 
     @GetMapping("/{id}")
