@@ -1,12 +1,14 @@
-CREATE SEQUENCE football.team_id_seq START 1;
-CREATE SEQUENCE football.player_id_seq START 1;
+CREATE SCHEMA IF NOT EXISTS football;
 
-CREATE TABLE football.team (
+CREATE SEQUENCE IF NOT EXISTS football.team_id_seq START 1;
+CREATE SEQUENCE IF NOT EXISTS football.player_id_seq START 1;
+
+CREATE TABLE IF NOT EXISTS football.team (
     id BIGINT PRIMARY KEY DEFAULT nextval('football.team_id_seq'),
     name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE football.player (
+CREATE TABLE IF NOT EXISTS football.player (
     id BIGINT PRIMARY KEY DEFAULT nextval('football.player_id_seq'),
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -14,7 +16,7 @@ CREATE TABLE football.player (
     id_team BIGINT REFERENCES football.team(id)
 );
 
-CREATE INDEX idx_player_id_team ON football.player(id_team);
+CREATE INDEX IF NOT EXISTS idx_player_id_team ON football.player(id_team);
 
 -- Team 1: Red Dragons
 INSERT INTO football.team (id, name)

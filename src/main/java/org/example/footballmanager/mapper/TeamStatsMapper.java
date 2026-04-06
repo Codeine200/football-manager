@@ -4,14 +4,13 @@ import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.entity.MatchStatsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring" , uses = {TeamFileStorageMapper.class})
 public interface TeamStatsMapper {
 
-    TeamStatsMapper INSTANCE = Mappers.getMapper(TeamStatsMapper.class);
-
-    @Mapping(target = "teamId", source = "team.id")
-    @Mapping(target = "teamName", source = "team.name")
+    @Mapping(target = "id", source = "team.id")
+    @Mapping(target = "name", source = "team.name")
+    @Mapping(target = "imageUrl", source = "team.logo", qualifiedByName = "buildImageUrl")
     MatchResponseDto.TeamStatsDto toDto(MatchStatsEntity stats);
+
 }

@@ -3,6 +3,7 @@ package org.example.footballmanager.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.footballmanager.domain.TeamTournamentStats;
 import org.example.footballmanager.dto.request.MatchFinishRequestDto;
 import org.example.footballmanager.dto.request.MatchRequestDto;
 import org.example.footballmanager.dto.request.MatchUpdateRequestDto;
@@ -10,6 +11,8 @@ import org.example.footballmanager.dto.response.MatchResponseDto;
 import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.facade.MatchFacade;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,8 +22,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/matches")
@@ -29,9 +36,18 @@ public class MatchController {
 
     private final MatchFacade matchFacade;
 
+    @GetMapping("/seasons")
+    public PageResponse<Map<Integer, List<TeamTournamentStats>>> getTeamStatsBySeason(
+            @PageableDefault(size = 1, sort = {"season"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        return matchFacade.getTeamStatsBySeason(pageable);
+    }
+
     @GetMapping
-    public PageResponse<MatchResponseDto> getAll(Pageable pageable) {
-        return matchFacade.findAll(pageable);
+    public PageResponse<MatchResponseDto> searchMatches(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean isFinished,
+            @PageableDefault(sort = {"matchDateTime"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        return matchFacade.searchMatches(search, isFinished, pageable);
     }
 
     @PostMapping

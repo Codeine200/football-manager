@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -32,10 +33,12 @@ public class TeamFacade {
     private final TeamFileStorageService fileStorageService;
 
     @Cacheable(value = "teams", key = "#id")
+    @Transactional(readOnly = true)
     public TeamResponseDto findById(Long id) {
         return teamMapper.toDto(teamService.findById(id));
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(
             value = "teams-page",
             key = "'p=' + #pageable.pageNumber + " +

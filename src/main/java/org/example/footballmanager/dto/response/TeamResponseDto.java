@@ -1,7 +1,15 @@
 package org.example.footballmanager.dto.response;
 
-public record TeamResponseDto (
+import java.util.List;
+
+public record TeamResponseDto(
         Long id,
         String name,
-        String imageUrl
-) {}
+        String imageUrl,
+        List<Player> players
+) {
+    public record Player(
+            String fullName,
+            String photo
+    ) {}
+}

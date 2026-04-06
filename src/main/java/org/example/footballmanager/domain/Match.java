@@ -3,28 +3,28 @@ package org.example.footballmanager.domain;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 public class Match {
 
     private final Long season;
-    private final LocalDate matchDate;
+    private final LocalDateTime matchDateTime;
     private final Team team1;
     private final Team team2;
 
     @Builder
     public Match(
             Long season,
-            LocalDate matchDate,
+            LocalDateTime matchDateTime,
             Team team1,
             Team team2
     ) {
         if (season == null) {
             throw new IllegalArgumentException("SeasonId must not be null");
         }
-        if (matchDate == null) {
-            throw new IllegalArgumentException("Match date must not be null");
+        if (matchDateTime == null) {
+            throw new IllegalArgumentException("Match date time must not be null");
         }
         if (team1 == null || team2 == null) {
             throw new IllegalArgumentException("Both teams must be provided");
@@ -38,7 +38,7 @@ public class Match {
         }
 
         this.season = season;
-        this.matchDate = matchDate;
+        this.matchDateTime = matchDateTime;
         this.team1 = team1;
         this.team2 = team2;
     }

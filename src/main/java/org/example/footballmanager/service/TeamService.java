@@ -1,6 +1,5 @@
 package org.example.footballmanager.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.footballmanager.entity.TeamEntity;
@@ -13,6 +12,7 @@ import org.example.footballmanager.store.TeamFileStorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -38,11 +38,13 @@ public class TeamService {
         return teamEntity;
     }
 
+    @Transactional(readOnly = true)
     public TeamEntity findById(Long id) {
         return teamRepository.findById(id)
                 .orElseThrow(() -> new TeamNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
     public Page<TeamEntity> searchTeams(String search, Pageable pageable) {
         return teamRepository.searchTeams(search, pageable);
     }
@@ -51,6 +53,7 @@ public class TeamService {
         return teamRepository.getReferenceById(id);
     }
 
+    @Transactional(readOnly = true)
     public Page<TeamEntity> findAll(Pageable pageable) {
         return teamRepository.findAll(pageable);
     }

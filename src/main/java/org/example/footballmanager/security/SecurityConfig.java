@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                             .requestMatchers("/auth/**").permitAll()
+                            .requestMatchers("/api/v1/matches/**").permitAll()
                             .requestMatchers("/api/v1/players/**").permitAll()
                             .requestMatchers("/api/v1/teams/**").permitAll()
                             .requestMatchers("/files/**").permitAll()

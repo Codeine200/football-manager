@@ -4,14 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.footballmanager.entity.TeamEntity;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamTournamentStats {
-    TeamEntity teamEntity;
+    TeamData team;
     Integer season;
     Integer played = 0;
     Integer wins = 0;

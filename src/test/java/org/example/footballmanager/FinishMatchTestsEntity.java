@@ -19,7 +19,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +64,7 @@ public class FinishMatchTestsEntity {
 
         MatchEntity matchEntity = MatchEntity.builder()
                 .season(2025)
-                .matchDate(LocalDate.now())
+                .matchDateTime(LocalDateTime.now())
                 .stats(new ArrayList<>())
                 .build();
 

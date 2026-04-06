@@ -9,11 +9,13 @@ import org.example.footballmanager.domain.Team;
 import org.example.footballmanager.domain.TeamFullInfo;
 import org.example.footballmanager.domain.TeamId;
 import org.example.footballmanager.domain.TeamTournamentStats;
+import org.example.footballmanager.dto.response.PageResponse;
 import org.example.footballmanager.entity.MatchEntity;
 import org.example.footballmanager.entity.MatchStatsEntity;
 import org.example.footballmanager.entity.TeamEntity;
 import org.example.footballmanager.exception.MatchNotFoundException;
 import org.example.footballmanager.mapper.MatchMapper;
+import org.example.footballmanager.mapper.TeamMapper;
 import org.example.footballmanager.repository.MatchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,16 +36,22 @@ public class MatchService {
 
     private final MatchRepository matchRepository;
     private final MatchMapper matchMapper;
+    private final TeamMapper teamMapper;
     private final TeamService teamService;
 
+    @Transactional(readOnly = true)
     public MatchEntity findById(Long id) {
         return matchRepository.findById(id)
                 .orElseThrow(() -> new MatchNotFoundException(id));
     }
 
-    public Page<MatchEntity> findAll(Pageable pageable) {
-        return matchRepository
-                .findAll(pageable);
+    @Transactional(readOnly = true)
+    public Page<MatchEntity> searchMatches(String search, Boolean isFinished, Pageable pageable) {
+        if (search == null || search.isBlank()) {
+            return matchRepository.findByIsFinished(Boolean.TRUE.equals(isFinished), pageable);
+        }
+
+        return matchRepository.searchMatches(search.trim(), isFinished, pageable);
     }
 
     public MatchEntity createMatch(Match matchCreate) {
@@ -59,56 +68,77 @@ public class MatchService {
         return matchRepository.save(matchEntity);
     }
 
-    public Set<TeamTournamentStats> getTeamStatsBySeason(Integer season) {
-        List<MatchEntity> matchEntities = matchRepository.findAllBySeason(season);
-        if (matchEntities.isEmpty()) {
-            return Collections.emptySet();
-        }
+    public PageResponse<Map<Integer, List<TeamTournamentStats>>> getTeamStatsBySeason(Pageable pageable) {
+        Page<Integer> seasonsPage = matchRepository.findDistinctSeasons(pageable);
+        List<Integer> seasons = seasonsPage.getContent();
 
-        Map<TeamEntity, TeamTournamentStats> teamMap = new HashMap<>();
-        matchEntities.forEach(match -> {
-            List<MatchStatsEntity> stats = match.getStats();
-            if (stats.size() != 2) {
-                throw new IllegalStateException(
-                        "Invalid match state: expected exactly 2 team stats for match id="
-                                + match.getId()
-                                + ", but found "
-                                + stats.size()
-                );
+        Map<Integer, List<TeamTournamentStats>> map = new TreeMap<>(Comparator.reverseOrder());
+        seasons.forEach(season -> {
+            List<MatchEntity> matchEntities = matchRepository.findAllBySeasonAndIsFinishedTrue(season);
+            if (matchEntities.isEmpty()) {
+                map.put(season, Collections.emptyList());
             }
 
-            MatchStatsEntity teamStats1 = stats.getFirst();
-            MatchStatsEntity teamStats2 = stats.getLast();
+            Map<TeamEntity, TeamTournamentStats> teamMap = new HashMap<>();
+            matchEntities.forEach(match -> {
+                List<MatchStatsEntity> stats = match.getStats();
+                if (stats.size() != 2) {
+                    throw new IllegalStateException(
+                            "Invalid match state: expected exactly 2 team stats for match id="
+                                    + match.getId()
+                                    + ", but found "
+                                    + stats.size()
+                    );
+                }
 
-            TeamTournamentStats teamTournamentStats1 =  teamMap.getOrDefault(teamStats1.getTeam(), new TeamTournamentStats());
-            teamTournamentStats1.setTeamEntity(teamStats1.getTeam());
-            TeamTournamentStats teamTournamentStats2 =  teamMap.getOrDefault(teamStats2.getTeam(), new TeamTournamentStats());
-            teamTournamentStats2.setTeamEntity(teamStats2.getTeam());
+                MatchStatsEntity teamStats1 = stats.getFirst();
+                MatchStatsEntity teamStats2 = stats.getLast();
 
-            teamTournamentStats1.setSeason(match.getSeason());
-            teamTournamentStats1.setPlayed(teamTournamentStats1.getPlayed() + 1);
-            teamTournamentStats1.setWins((teamStats1.getIsWinner()) ? teamTournamentStats1.getWins() + 1 : teamTournamentStats1.getWins());
-            teamTournamentStats1.setDraws((!teamStats1.getIsWinner() && !teamStats2.getIsWinner()) ? teamTournamentStats1.getDraws() + 1 : teamTournamentStats1.getDraws());
-            teamTournamentStats1.setLosses((!teamStats1.getIsWinner()) ? teamTournamentStats1.getLosses() + 1 : teamTournamentStats1.getLosses());
-            teamTournamentStats1.setGoalsFor(teamTournamentStats1.getGoalsFor() + teamStats1.getGoals());
-            teamTournamentStats1.setGoalsAgainst(teamTournamentStats1.getGoalsAgainst() + teamStats2.getGoals());
-            teamTournamentStats1.setGoalDifference(teamTournamentStats1.getGoalsFor() - teamTournamentStats1.getGoalsAgainst());
-            teamTournamentStats1.setPoints(teamTournamentStats1.getPoints() + teamStats1.getScore());
-            teamMap.put(teamStats1.getTeam(), teamTournamentStats1);
+                TeamTournamentStats teamTournamentStats1 = teamMap.getOrDefault(teamStats1.getTeam(), new TeamTournamentStats());
+                teamTournamentStats1.setTeam(teamMapper.toDomain(teamStats1.getTeam()));
+                TeamTournamentStats teamTournamentStats2 = teamMap.getOrDefault(teamStats2.getTeam(), new TeamTournamentStats());
+                teamTournamentStats2.setTeam(teamMapper.toDomain(teamStats2.getTeam()));
 
-            teamTournamentStats2.setSeason(match.getSeason());
-            teamTournamentStats2.setPlayed(teamTournamentStats2.getPlayed() + 1);
-            teamTournamentStats2.setWins((teamStats2.getIsWinner()) ? teamTournamentStats2.getWins() + 1 : teamTournamentStats2.getWins());
-            teamTournamentStats2.setDraws((!teamStats1.getIsWinner() && !teamStats2.getIsWinner()) ? teamTournamentStats2.getDraws() + 1 : teamTournamentStats2.getDraws());
-            teamTournamentStats2.setLosses((!teamStats2.getIsWinner()) ? teamTournamentStats2.getLosses() + 1 : teamTournamentStats2.getLosses());
-            teamTournamentStats2.setGoalsFor(teamTournamentStats2.getGoalsFor() + teamStats2.getGoals());
-            teamTournamentStats2.setGoalsAgainst(teamTournamentStats2.getGoalsAgainst() + teamStats1.getGoals());
-            teamTournamentStats2.setGoalDifference(teamTournamentStats2.getGoalsFor() - teamTournamentStats2.getGoalsAgainst());
-            teamTournamentStats2.setPoints(teamTournamentStats2.getPoints() + teamStats2.getScore());
-            teamMap.put(teamStats2.getTeam(), teamTournamentStats2);
+                teamTournamentStats1.setSeason(match.getSeason());
+                teamTournamentStats1.setPlayed(teamTournamentStats1.getPlayed() + 1);
+                teamTournamentStats1.setWins((teamStats1.getIsWinner()) ? teamTournamentStats1.getWins() + 1 : teamTournamentStats1.getWins());
+                teamTournamentStats1.setDraws((!teamStats1.getIsWinner() && !teamStats2.getIsWinner()) ? teamTournamentStats1.getDraws() + 1 : teamTournamentStats1.getDraws());
+                teamTournamentStats1.setLosses((!teamStats1.getIsWinner()) ? teamTournamentStats1.getLosses() + 1 : teamTournamentStats1.getLosses());
+                teamTournamentStats1.setGoalsFor(teamTournamentStats1.getGoalsFor() + teamStats1.getGoals());
+                teamTournamentStats1.setGoalsAgainst(teamTournamentStats1.getGoalsAgainst() + teamStats2.getGoals());
+                teamTournamentStats1.setGoalDifference(teamTournamentStats1.getGoalsFor() - teamTournamentStats1.getGoalsAgainst());
+                teamTournamentStats1.setPoints(teamTournamentStats1.getPoints() + teamStats1.getScore());
+                teamMap.put(teamStats1.getTeam(), teamTournamentStats1);
+
+                teamTournamentStats2.setSeason(match.getSeason());
+                teamTournamentStats2.setPlayed(teamTournamentStats2.getPlayed() + 1);
+                teamTournamentStats2.setWins((teamStats2.getIsWinner()) ? teamTournamentStats2.getWins() + 1 : teamTournamentStats2.getWins());
+                teamTournamentStats2.setDraws((!teamStats1.getIsWinner() && !teamStats2.getIsWinner()) ? teamTournamentStats2.getDraws() + 1 : teamTournamentStats2.getDraws());
+                teamTournamentStats2.setLosses((!teamStats2.getIsWinner()) ? teamTournamentStats2.getLosses() + 1 : teamTournamentStats2.getLosses());
+                teamTournamentStats2.setGoalsFor(teamTournamentStats2.getGoalsFor() + teamStats2.getGoals());
+                teamTournamentStats2.setGoalsAgainst(teamTournamentStats2.getGoalsAgainst() + teamStats1.getGoals());
+                teamTournamentStats2.setGoalDifference(teamTournamentStats2.getGoalsFor() - teamTournamentStats2.getGoalsAgainst());
+                teamTournamentStats2.setPoints(teamTournamentStats2.getPoints() + teamStats2.getScore());
+                teamMap.put(teamStats2.getTeam(), teamTournamentStats2);
+            });
+            map.put(season,
+                    teamMap.values().stream()
+                            .sorted(Comparator
+                                    .comparing(TeamTournamentStats::getPoints).reversed()
+                                    .thenComparing(TeamTournamentStats::getGoalDifference).reversed()
+                                    .thenComparing(TeamTournamentStats::getGoalsFor).reversed()
+                            )
+                            .collect(Collectors.toList())
+            );
         });
 
-        return new HashSet<>(teamMap.values());
+        return new PageResponse<>(
+                List.of(map),
+                seasonsPage.getNumber(),
+                seasonsPage.getSize(),
+                seasonsPage.getTotalElements(),
+                seasonsPage.getTotalPages()
+        );
     }
 
     @Transactional

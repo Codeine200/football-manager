@@ -35,7 +35,7 @@ GET http://localhost:8080/api/v1/teams
 GET http://localhost:8080/api/v1/teams?page=0&size=10
 
 ### Get a team by ID
-GET http://localhost:8080/api/v1/teams/13
+GET http://localhost:8080/api/v1/teams/2
 
 ### Update a team
 PUT http://localhost:8080/api/v1/teams/13
@@ -136,6 +136,15 @@ GET http://localhost:8080/api/v1/players?search=font
 # MATCH REQUESTS
 # =============================
 
+### Get statistics by season
+GET http://localhost:8080/api/v1/matches/seasons
+
+### Get all matches
+GET http://localhost:8080/api/v1/matches
+
+### Get upcoming matches
+GET http://localhost:8080/api/v1/matches?search=
+
 ### Craete a match
 POST http://localhost:8080/api/v1/matches
 Content-Type: application/json
@@ -154,17 +163,17 @@ Content-Type: application/json
 }
 
 ### Finish match with id = 1
-POST http://localhost:8080/api/v1/matches/1/finish
+POST http://localhost:8080/api/v1/matches/20/finish
 Content-Type: application/json
 
 {
   "team1": {
-    "teamId": 1,
-    "goals": 7
+    "teamId": 4,
+    "goals": 2
   },
   "team2": {
-    "teamId": 2,
-    "goals": 6
+    "teamId": 5,
+    "goals": 3
   }
 }
 
@@ -219,7 +228,7 @@ Content-Type: image/svg+xml
 --WebAppBoundary--
 
 ### Auth
-POST http://localhost:8081/auth/login
+POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {

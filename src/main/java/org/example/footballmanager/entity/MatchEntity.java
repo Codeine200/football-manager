@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +41,8 @@ public class MatchEntity {
     @Column(nullable = false)
     private Integer season;
 
-    @Column(name = "match_date", nullable = false)
-    private LocalDate matchDate;
+    @Column(name = "match_date_time", nullable = false)
+    private LocalDateTime matchDateTime;
 
     @Column(name = "is_finished")
     private boolean isFinished;

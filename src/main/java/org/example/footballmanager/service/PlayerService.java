@@ -47,19 +47,23 @@ public class PlayerService {
         return save(playerEntity, file);
     }
 
+    @Transactional(readOnly = true)
     public PlayerEntity findById(Long id) {
         return playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
     public Page<PlayerEntity> findAll(Pageable pageable) {
         return playerRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<PlayerEntity> searchPlayers(Long teamId, String search, Pageable pageable) {
         return playerRepository.searchPlayers(teamId, search, pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<PlayerEntity> findAllByTeamId(Long teamId, Pageable pageable) {
         return playerRepository.findAllByTeam_Id(teamId, pageable);
     }

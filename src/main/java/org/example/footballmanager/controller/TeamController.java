@@ -33,7 +33,7 @@ public class TeamController {
     @GetMapping
     public PageResponse<TeamResponseDto> getAll(
             @RequestParam(required = false) String search,
-             @PageableDefault(sort = {"name"}) Pageable pageable) {
+            @PageableDefault(sort = {"name"}) Pageable pageable) {
         return teamFacade.findAll(search, pageable);
     }
 

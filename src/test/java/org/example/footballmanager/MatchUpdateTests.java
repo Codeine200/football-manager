@@ -17,7 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,7 +45,7 @@ public class MatchUpdateTests {
         registry.add("spring.datasource.username", postgresContainer::getUsername);
         registry.add("spring.datasource.password", postgresContainer::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
-        registry.add("spring.datasource.embedded-database-connection", () -> "NONE");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
     }
 
     @Autowired
@@ -54,13 +54,12 @@ public class MatchUpdateTests {
     @Autowired
     private MatchRepository matchRepository;
 
-
     @Test
     @Transactional
     void shouldUpdateMatchWhenMatchIsNotFinished() {
         MatchFullInfo update = MatchFullInfo.builder()
                 .season(2026)
-                .matchDate(LocalDate.of(2026,1,1))
+                .matchDateTime(LocalDateTime.of(2026,1,1,15,0))
                 .isFinished(true)
                 .team1(new TeamFullInfo(new TeamId(1L), 2, false))
                 .team2(new TeamFullInfo(new TeamId(2L), 5, true))
@@ -72,10 +71,10 @@ public class MatchUpdateTests {
         MatchEntity updated = matchRepository.findById(matchId).orElseThrow();
 
         assertEquals(2026, updated.getSeason());
-        assertEquals(false, updated.getStats().getFirst().getIsWinner());
-        assertEquals(2, updated.getStats().getFirst().getGoals());
-        assertEquals(true, updated.getStats().getLast().getIsWinner());
-        assertEquals(5, updated.getStats().getLast().getGoals());
+        assertEquals(false, updated.getStats().get(0).getIsWinner());
+        assertEquals(2, updated.getStats().get(0).getGoals());
+        assertEquals(true, updated.getStats().get(1).getIsWinner());
+        assertEquals(5, updated.getStats().get(1).getGoals());
     }
 
     @Test
@@ -83,7 +82,7 @@ public class MatchUpdateTests {
     void shouldUpdateMatchWhenMatchIsFinished() {
         MatchFullInfo update = MatchFullInfo.builder()
                 .season(2026)
-                .matchDate(LocalDate.of(2026,1,1))
+                .matchDateTime(LocalDateTime.of(2026,1,1,15,0))
                 .team1(new TeamFullInfo(new TeamId(3L), 3, true))
                 .team2(new TeamFullInfo(new TeamId(4L), 2, false))
                 .isFinished(false)
@@ -95,9 +94,9 @@ public class MatchUpdateTests {
         MatchEntity updated = matchRepository.findById(matchId).orElseThrow();
 
         assertEquals(2026, updated.getSeason());
-        assertNull(updated.getStats().getFirst().getScore());
-        assertNull(updated.getStats().getFirst().getGoals());
-        assertNull(updated.getStats().getFirst().getIsWinner());
+        assertNull(updated.getStats().get(0).getScore());
+        assertNull(updated.getStats().get(0).getGoals());
+        assertNull(updated.getStats().get(0).getIsWinner());
         assertFalse(updated.isFinished());
     }
 }

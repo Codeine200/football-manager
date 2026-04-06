@@ -1,13 +1,14 @@
 package org.example.footballmanager.dto.response;
 
 import lombok.Data;
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 @Data
 public class MatchResponseDto {
 
     private Long id;
-    private LocalDate matchDate;
+    private LocalDateTime matchDateTime;
     private String status;
 
     private TeamStatsDto team1;
@@ -15,12 +16,13 @@ public class MatchResponseDto {
 
     @Data
     public static class TeamStatsDto {
-        private Long teamId;
-        private String teamName;
+        private Long id;
+        private String name;
         private boolean isGuest;
         private Integer goals;
         private Integer score;
         private Boolean isWinner;
+        private String imageUrl;
     }
 }
 

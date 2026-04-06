@@ -17,15 +17,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@Mapper(componentModel = "spring", uses = {TeamStatsMapper.class, TeamFileStorageMapper.class})
+public abstract class MatchMapper {
 
-@Mapper(componentModel = "spring", uses = {TeamStatsMapper.class})
-public interface MatchMapper {
+    @Autowired
+    protected TeamStatsMapper teamStatsMapper;
 
     @Mapping(target = "id", ignore = true)
-    MatchEntity toEntity(Match matchCreate);
+    public abstract MatchEntity toEntity(Match matchCreate);
 
-    default MatchFinish toDomain(MatchFinishRequestDto dto) {
+    public MatchFinish toDomain(MatchFinishRequestDto dto) {
         return new MatchFinish(
                 new MatchTeamResult(new TeamId(dto.team1().teamId()), dto.team1().goals()),
                 new MatchTeamResult(new TeamId(dto.team2().teamId()), dto.team2().goals())
@@ -34,9 +37,9 @@ public interface MatchMapper {
 
     @Mapping(target = "team1", expression = "java(mapTeam(dto.getTeam1()))")
     @Mapping(target = "team2", expression = "java(mapTeam(dto.getTeam2()))")
-    Match toDomain(MatchRequestDto dto);
+    public abstract Match toDomain(MatchRequestDto dto);
 
-    default Team mapTeam(MatchRequestDto.TeamDto dto) {
+    protected Team mapTeam(MatchRequestDto.TeamDto dto) {
         return new Team(
                 new TeamId(dto.getId()),
                 dto.isGuest()
@@ -45,38 +48,39 @@ public interface MatchMapper {
 
     @Mapping(target = "team1", source = "match", qualifiedByName = "mapTeam1")
     @Mapping(target = "team2", source = "match", qualifiedByName = "mapTeam2")
-    MatchResponseDto toDto(MatchEntity match);
+    public abstract MatchResponseDto toDto(MatchEntity match);
 
     @Mapping(target = "team1", source = "team1")
     @Mapping(target = "team2", source = "team2")
-    MatchFullInfo toDomain(MatchUpdateRequestDto dto);
+    public abstract MatchFullInfo toDomain(MatchUpdateRequestDto dto);
 
     @Mapping(target = "teamId", source = "id")
-    TeamFullInfo toDomain(MatchUpdateRequestDto.TeamDto dto);
+    public abstract TeamFullInfo toDomain(MatchUpdateRequestDto.TeamDto dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "stats", ignore = true)
-    void updateFromMatchFullInfo(MatchFullInfo matchFullInfo, @MappingTarget MatchEntity entity);
+    public abstract void updateFromMatchFullInfo(MatchFullInfo matchFullInfo,
+                                                 @MappingTarget MatchEntity entity);
 
     @Named("mapTeam1")
-    default MatchResponseDto.TeamStatsDto mapTeam1(MatchEntity matchEntity) {
+    protected MatchResponseDto.TeamStatsDto mapTeam1(MatchEntity matchEntity) {
         return matchEntity.getStats().stream()
                 .filter(MatchStatsEntity::isGuest)
                 .findFirst()
-                .map(TeamStatsMapper.INSTANCE::toDto)
+                .map(teamStatsMapper::toDto)
                 .orElse(null);
     }
 
     @Named("mapTeam2")
-    default  MatchResponseDto.TeamStatsDto mapTeam2(MatchEntity matchEntity) {
+    protected MatchResponseDto.TeamStatsDto mapTeam2(MatchEntity matchEntity) {
         return matchEntity.getStats().stream()
                 .filter(s -> !s.isGuest())
                 .findFirst()
-                .map(TeamStatsMapper.INSTANCE::toDto)
+                .map(teamStatsMapper::toDto)
                 .orElse(null);
     }
 
-    default TeamId map(Long value) {
+    protected TeamId map(Long value) {
         return value == null ? null : new TeamId(value);
     }
 }
