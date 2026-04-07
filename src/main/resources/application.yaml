@@ -39,8 +39,10 @@ spring:
             spec: maximumSize=500,expireAfterWrite=10m
 
 jwt:
-    secret: verySecretKeyverySecretKeyverySecretKeyverySecretKey
-    expiration: 86400000
+    access-secret: verySecretKeyverySecretKeyverySecretKeyverySecretKey
+    access-expiration: 600000
+    refresh-secret: verySecretKeyverySecretKey
+    refresh-expiration: 604800000
 
 uploads:
     teams-photos-folder: ${UPLOADS_TEAMS_PHOTOS_FOLDER:/home/codeine/football-manager/uploads/teams}

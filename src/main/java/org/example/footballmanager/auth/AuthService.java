@@ -17,7 +17,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    public JwtResponseDto login(LoginRequestDto request) {
+    public AuthTokens login(LoginRequestDto request) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -27,7 +27,8 @@ public class AuthService {
         );
 
         UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
-        String token = jwtService.generateToken(user);
-        return new JwtResponseDto(token);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new AuthTokens(accessToken, refreshToken);
     }
 }
