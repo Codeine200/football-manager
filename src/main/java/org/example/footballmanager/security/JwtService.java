@@ -37,6 +37,16 @@ public class JwtService {
                 .compact();
     }
 
+    public String generateAccessTokenFromRefresh(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        String username = jwtUtil.extractUsername(refreshToken);
+
+        return jwtUtil.generateAccessToken(username);
+    }
+
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
