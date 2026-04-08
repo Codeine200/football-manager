@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.footballmanager.config.JwtProperties;
+import org.example.footballmanager.security.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final JwtService jwtService;
     private final JwtProperties jwtProperties;
 
     @PostMapping("/login")
@@ -47,12 +49,11 @@ public class AuthController {
                 .orElse(null);
 
 
-        if (refreshToken == null || !jwtService.validateToken(refreshToken)) {
+        if (refreshToken == null || !jwtService.isRefreshTokenValid(refreshToken)) {
             return ResponseEntity.status(401).build();
         }
 
-        String newAccessToken = authService.generateAccessTokenFromRefresh(refreshToken);
-
-        return return ResponseEntity.ok(new JwtResponseDto(tokens.getAccessToken()));
+        String newAccessToken = jwtService.generateAccessTokenFromRefresh(refreshToken);
+        return ResponseEntity.ok(new JwtResponseDto(newAccessToken));
     }
 }

@@ -41,7 +41,7 @@ spring:
 jwt:
     access-secret: verySecretKeyverySecretKeyverySecretKeyverySecretKey
     access-expiration: 600000
-    refresh-secret: verySecretKeyverySecretKey
+    refresh-secret: h3v8K9f7q2y1R4wZ6tX9sA0bQ2uY5nF1pL7vH8mJ3kR0cV4x
     refresh-expiration: 604800000
 
 uploads:
