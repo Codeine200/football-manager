@@ -51,7 +51,7 @@ public class JwtService {
             throw new RuntimeException("Invalid refresh token");
         }
 
-        String username = extractUsername(refreshToken);
+        String username = extractUsernameFromRefreshToken(refreshToken);
         UserDetails user = userDetailsService.loadUserByUsername(username);
 
         return generateAccessToken(user);
@@ -59,6 +59,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractAllClaims(token, jwtProperties.getAccessSecret()).getSubject();
+    }
+
+    public String extractUsernameFromRefreshToken(String token) {
+        return extractAllClaims(token, jwtProperties.getRefreshSecret()).getSubject();
     }
 
     @SuppressWarnings("unchecked")

@@ -31,7 +31,7 @@ public class AuthController {
         cookie.setSecure(false); // true HTTPS for production
         cookie.setPath("/auth/refresh");
         cookie.setMaxAge((int)jwtProperties.getRefreshExpiration());
-        cookie.setAttribute("SameSite", "None");
+        cookie.setAttribute("SameSite", "Lax"); // None for production
 
         response.addCookie(cookie);
 
@@ -40,8 +40,12 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponseDto> refreshToken(HttpServletRequest request) {
-
+        System.out.println("######");
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return ResponseEntity.status(401).build();
+        }
+
         String refreshToken = Arrays.stream(cookies)
                 .filter(c -> "refreshToken".equals(c.getName()))
                 .map(Cookie::getValue)
