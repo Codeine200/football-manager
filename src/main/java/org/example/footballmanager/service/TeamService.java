@@ -38,6 +38,10 @@ public class TeamService {
         return teamEntity;
     }
 
+    public TeamEntity save(TeamEntity teamEntity) {
+        return teamRepository.save(teamEntity);
+    }
+
     @Transactional(readOnly = true)
     public TeamEntity findById(Long id) {
         return teamRepository.findById(id)

@@ -104,4 +104,26 @@ public class TeamFacade {
             }
         }
     }
+
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "teams", key = "#id"),
+                    @CacheEvict(value = "teams-page", allEntries = true),
+            }
+    )
+    public void deleteLogoByTeamId(Long id) {
+        TeamEntity teamEntity = teamService.findById(id);
+        if (teamEntity.getLogo() != null && !teamEntity.getLogo().isBlank()) {
+            try {
+                fileStorageService.delete(teamEntity.getLogo());
+                teamEntity.setLogo(null);
+                teamService.save(teamEntity);
+            } catch (IOException e) {
+                log.error("Failed to delete logo file '{}' for team with id {}",
+                        teamEntity.getLogo(),
+                        teamEntity.getId(),
+                        e);
+            }
+        }
+    }
 }

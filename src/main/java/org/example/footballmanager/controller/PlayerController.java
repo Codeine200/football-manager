@@ -81,5 +81,12 @@ public class PlayerController {
     public void delete(@PathVariable Long id) {
         playerFacade.deleteById(id);
     }
+
+    @DeleteMapping("/{id}/photo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteLogo(@PathVariable Long id) {
+        playerFacade.deletePhotoByPlayerId(id);
+    }
 }
 

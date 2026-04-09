@@ -130,4 +130,26 @@ public class PlayerFacade {
             }
         }
     }
+
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "players-page", allEntries = true),
+                    @CacheEvict(value = "players", key = "#id"),
+            }
+    )
+    public void deletePhotoByPlayerId(Long id) {
+        PlayerEntity playerEntity = playerService.findById(id);
+        if (playerEntity.getPhoto() != null && !playerEntity.getPhoto().isBlank()) {
+            try {
+                fileStorageService.delete(playerEntity.getPhoto());
+                playerEntity.setPhoto(null);
+                playerService.save(playerEntity);
+            } catch (IOException e) {
+                log.error("Failed to delete photo file '{}' for player with id {}",
+                        playerEntity.getPhoto(),
+                        playerEntity.getId(),
+                        e);
+            }
+        }
+    }
 }

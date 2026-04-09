@@ -68,4 +68,11 @@ public class TeamController {
     public void delete(@PathVariable Long id) {
         teamFacade.deleteById(id);
     }
+
+    @DeleteMapping("/{id}/photo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteLogo(@PathVariable Long id) {
+        teamFacade.deleteLogoByTeamId(id);
+    }
 }

@@ -36,6 +36,10 @@ public class PlayerService {
         return savedPlayerEntity;
     }
 
+    public PlayerEntity save(PlayerEntity playerEntity) {
+        return playerRepository.save(playerEntity);
+    }
+
     @Transactional
     public PlayerEntity create(Player player, MultipartFile file) {
         PlayerEntity playerEntity = playerMapper.toEntity(player);
