@@ -38,6 +38,21 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponseDto(tokens.getAccessToken()));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // true HTTPS for production
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge(0);
+        cookie.setAttribute("SameSite", "Lax"); //  None + Secure=true
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponseDto> refreshToken(HttpServletRequest request) {
         System.out.println("######");
