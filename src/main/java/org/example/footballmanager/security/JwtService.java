@@ -1,6 +1,7 @@
 package org.example.footballmanager.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -80,22 +81,26 @@ public class JwtService {
     }
 
     public boolean isAccessTokenValid(String token) {
-        return !isTokenExpired(token, jwtProperties.getAccessSecret());
+        return isTokenExpired(token, jwtProperties.getAccessSecret());
     }
 
     public boolean isRefreshTokenValid(String token) {
-        return !isTokenExpired(token, jwtProperties.getRefreshSecret());
+        return isTokenExpired(token, jwtProperties.getRefreshSecret());
     }
 
     private boolean isTokenExpired(String token, String secret) {
-        return extractAllClaims(token, secret)
-                .getExpiration()
-                .before(new Date());
+        try {
+            extractAllClaims(token, secret);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     private Claims extractAllClaims(String token, String secret) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey(secret))
+                .setAllowedClockSkewSeconds(60)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
